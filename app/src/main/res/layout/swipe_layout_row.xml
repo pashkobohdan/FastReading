@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="70dp">
+
+    <com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/book_swipe_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Bottom View Start -->
+        <LinearLayout
+            android:id="@+id/bottom_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:tag="Bottom1"
+            android:weightSum="1">
+
+            <include layout="@layout/swipe_layout_bottom_view" />
+        </LinearLayout>
+        <!-- Bottom View End -->
+
+
+        <!-- Surface View Start -->
+        <LinearLayout
+            android:padding="5dp"
+            android:id="@+id/bottom_wrapper_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tag="Bottom4">
+
+            <include layout="@layout/swipe_layout_surface_view" />
+
+        </LinearLayout>
+        <!-- Surface View End -->
+
+    </com.daimajia.swipe.SwipeLayout>
+</LinearLayout>

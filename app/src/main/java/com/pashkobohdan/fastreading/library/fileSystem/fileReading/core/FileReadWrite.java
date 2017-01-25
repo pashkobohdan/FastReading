@@ -1,4 +1,4 @@
-package com.pashkobohdan.fastreading.library.fileSystem.baseFileReading.core;
+package com.pashkobohdan.fastreading.library.fileSystem.fileReading.core;
 
 import android.support.annotation.NonNull;
 

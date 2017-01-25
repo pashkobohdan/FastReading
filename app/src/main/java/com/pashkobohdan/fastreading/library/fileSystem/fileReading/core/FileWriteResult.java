@@ -1,4 +1,4 @@
-package com.pashkobohdan.fastreading.library.fileSystem.baseFileReading.core;
+package com.pashkobohdan.fastreading.library.fileSystem.fileReading.core;
 
 /**
  * Created by Bohdan Pashko on 16.01.17.

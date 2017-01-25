@@ -1,4 +1,4 @@
-package com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core;
+package com.pashkobohdan.fastreading.library.fileSystem.fileReading;
 
 import android.content.Context;
 
@@ -9,9 +9,9 @@ import java.io.File;
  */
 
 public class InternalStorageFileHelper {
-    private static final String INTERNAL_FILE_EXTENSION = ".tmp";
+    public static final String INTERNAL_FILE_EXTENSION = ".tmp";
 
-    private static String fileNameWithoutExtension(File file) {
+    public static String fileNameWithoutExtension(File file) {
         String inputFileName = file.getName();
 
         return inputFileName.lastIndexOf(".") > 0 ?
