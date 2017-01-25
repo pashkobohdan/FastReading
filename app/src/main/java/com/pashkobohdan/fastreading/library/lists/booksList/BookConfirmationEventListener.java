@@ -9,7 +9,7 @@ import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
  * Created by Bohdan Pashko on 24.01.17.
  */
 
-interface BookConfirmationEventListener {
+public interface BookConfirmationEventListener {
 
     void run(BookInfo bookInfo, Runnable runIfConfirmed);
 

@@ -1,28 +1,30 @@
 package com.pashkobohdan.fastreading.library.lists.booksList;
 
 import android.app.Activity;
-import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 import com.pashkobohdan.fastreading.R;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Book list (RecyclerView) adapter.
+ * <p>
  * Created by bohdan on 24.01.17.
  */
 
 public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolder> {
 
-    private List<BookInfo> mDataset;
+    private Activity activity;
+
+    private List<BookInfo> bookInfoList;
 
     private BookEventListener edit;
     private BookEventListener share;
@@ -31,14 +33,16 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
     private BookEventListener clickOnBook;
     private BookEventListener longClickOnBook;
 
-    public BooksRecyclerViewAdapter(List<BookInfo> objects,
+    public BooksRecyclerViewAdapter(Activity activity, List<BookInfo> bookInfoList,
                                     BookEventListener edit,
                                     BookEventListener share,
                                     BookEventListener upload,
                                     BookConfirmationEventListener delete,
                                     BookEventListener clickOnBook,
                                     BookEventListener longClickOnBook) {
-        this.mDataset = objects;
+        this.activity = activity;
+
+        this.bookInfoList = bookInfoList;
 
         this.edit = edit;
         this.share = share;
@@ -56,11 +60,10 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
 
     @Override
     public void onBindViewHolder(final BookViewHolder viewHolder, final int position) {
-        final BookInfo item = mDataset.get(position);
+        final BookInfo item = bookInfoList.get(position);
         viewHolder.setBookInfo(item);
 
         viewHolder.getSwipeLayout().setShowMode(SwipeLayout.ShowMode.PullOut);
-
 
         viewHolder.getSwipeLayout().setOnClickListener(new View.OnClickListener() {
 
@@ -104,20 +107,24 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
         viewHolder.getButtonDelete().setOnClickListener((View v) -> delete.run(item, () -> {
             mItemManger.removeShownLayouts(viewHolder.getSwipeLayout());
 
-            mDataset.remove(position);
+            bookInfoList.remove(position);
 
             notifyItemRemoved(position);
-            notifyItemRangeChanged(position, mDataset.size());
+            notifyItemRangeChanged(position, bookInfoList.size());
 
             mItemManger.closeAllItems();
         }));
 
         viewHolder.getBooksPicName().setText(item.getName().substring(0, 2).toUpperCase());
+        viewHolder.getBooksPicName().setBackgroundColor(item.getColor());
         viewHolder.getBookName().setText(item.getName());
         viewHolder.getBookAuthor().setText(item.getAuthor());
 
-        item.readWords(() -> viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber()),
-                () -> viewHolder.getBookCurrentAndTotalWords().setText("book reading error"));
+        item.readWords(() -> {
+            activity.runOnUiThread(() -> viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber()));
+        }, () -> {
+            activity.runOnUiThread(() -> viewHolder.getBookCurrentAndTotalWords().setText("reading error"));
+        });
 
 
         mItemManger.bindView(viewHolder.itemView, position); // was wrote BIND !
@@ -125,7 +132,7 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return bookInfoList.size();
     }
 
     @Override

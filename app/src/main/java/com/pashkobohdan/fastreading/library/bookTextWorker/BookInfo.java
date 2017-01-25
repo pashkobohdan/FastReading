@@ -1,13 +1,8 @@
 package com.pashkobohdan.fastreading.library.bookTextWorker;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.support.annotation.NonNull;
 
 import com.pashkobohdan.fastreading.library.fileSystem.fileReading.FileReadingAndWriting;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileReadWrite;
 
 import java.io.File;
@@ -18,9 +13,6 @@ import java.util.Random;
  */
 
 public class BookInfo {
-    public static final String BOOKS_POSITION_PREFERENCE_NAME = "books_positions";
-    public static final String BOOKS_AUTHOR_PREFERENCE_NAME = "books_authors";
-    public static final String BOOKS_COLOR_PREFERENCE_NAME = "book_colors";
 
     private File file;
 
@@ -28,7 +20,7 @@ public class BookInfo {
     private String author;
     private int color;
     private int wordsNumber;
-    private int currentWordNumber;
+    private int currentWordNumber = -1;
 
 
     /**
@@ -46,34 +38,15 @@ public class BookInfo {
     private SharedPreferences bookColorsPreferences;
     private SharedPreferences.Editor colorEditor;
 
-    /**
-     * Recommended constructor.
-     * Just set file of book and BookInfo is ready !
-     *
-     * @param file
-     * @param context
-     */
-    public BookInfo(@NonNull final File file, @NonNull final Activity context) {
-        this.setFile(file);
-        setName(InternalStorageFileHelper.fileNameWithoutExtension(file));
-
-        bookPositionsPreferences = context.getSharedPreferences(BOOKS_POSITION_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        bookAuthorsPreferences = context.getSharedPreferences(BOOKS_AUTHOR_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        bookColorsPreferences = context.getSharedPreferences(BOOKS_COLOR_PREFERENCE_NAME, Context.MODE_PRIVATE);
-
-        currentWordNumber = bookPositionsPreferences.getInt(name, 0);
-        author = bookAuthorsPreferences.getString(name, "no author");
-
-        Random random = new Random(System.nanoTime());
-        color = bookColorsPreferences.getInt(name, Color.argb(255, random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-
+    public BookInfo() {
     }
+
 
     public void readWords(final Runnable readingSuccess, final Runnable readingFailure) {
         new Thread(() -> {
             FileReadWrite fileReadWrite = new FileReadingAndWriting();
-            String bookText = fileReadWrite.read(file, (o, n) -> {
-            });
+            String bookText = fileReadWrite.read(file, (o, n) -> {});
+
             if (bookText == null) {
                 readingFailure.run();
             } else {
@@ -87,8 +60,14 @@ public class BookInfo {
 
                 readingSuccess.run();
             }
+
         }).start();
     }
+
+
+    /**
+     * Setters and getters
+     */
 
     public File getFile() {
         return file;
@@ -110,18 +89,6 @@ public class BookInfo {
         return author;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
     public int getWordsNumber() {
         return wordsNumber;
     }
@@ -132,10 +99,6 @@ public class BookInfo {
 
     public int getCurrentWordNumber() {
         return currentWordNumber;
-    }
-
-    public void setCurrentWordNumber(int currentWordNumber) {
-        this.currentWordNumber = currentWordNumber;
     }
 
     public String[] getWords() {
@@ -184,5 +147,46 @@ public class BookInfo {
 
     public void setColorEditor(SharedPreferences.Editor colorEditor) {
         this.colorEditor = colorEditor;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public SharedPreferences getBookColorsPreferences() {
+        return bookColorsPreferences;
+    }
+
+    public void setBookColorsPreferences(SharedPreferences bookColorsPreferences) {
+        this.bookColorsPreferences = bookColorsPreferences;
+    }
+
+
+    /**
+     * Setters and getters (when changes - write to SharedPreference)
+     */
+
+    public void setAuthor(String author) {
+        if (this.author != null && !this.author.equals(author)) {
+            bookAuthorsPreferences.edit().putString(name, author).apply();
+        }
+
+        this.author = author;
+    }
+
+    public void setColor(int color) {
+        if (this.color != color) {
+            getBookColorsPreferences().edit().putInt(name, color).apply();
+        }
+
+        this.color = color;
+    }
+
+    public void setCurrentWordNumber(int currentWordNumber) {
+        if (this.currentWordNumber != currentWordNumber) {
+            bookPositionsPreferences.edit().putInt(name, currentWordNumber).apply();
+        }
+
+        this.currentWordNumber = currentWordNumber;
     }
 }

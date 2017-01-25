@@ -24,7 +24,7 @@
 
         <!-- Surface View Start -->
         <LinearLayout
-            android:padding="5dp"
+            android:padding="4dp"
             android:id="@+id/bottom_wrapper_2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

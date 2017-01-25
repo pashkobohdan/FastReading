@@ -42,7 +42,12 @@ dependencies {
     // file choosing
     compile 'ir.sohreco.androidfilechooser:android-file-chooser:1.1.0'
 
-
+    // swipe layout (uses recycler view)
     compile "com.daimajia.swipelayout:library:1.2.0@aar"
+
+
+    // 'multi' fab
+    compile 'com.getbase:floatingactionbutton:1.10.1'
+
 
 }
