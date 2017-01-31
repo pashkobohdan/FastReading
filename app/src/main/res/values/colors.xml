@@ -6,4 +6,9 @@
     <color name="white">#FFFFFF</color>
     <color name="white_pressed">#EEEEEE</color>
     <color name="half_black">#CCCCFF</color>
+
+
+
+    <color name="plus_fab_button_color">#a9a9ff</color>
+    <color name="black_semi_transparent">#B2000000</color>
 </resources>

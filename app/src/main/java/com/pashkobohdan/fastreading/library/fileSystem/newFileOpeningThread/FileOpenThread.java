@@ -9,9 +9,11 @@ import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.AnyFileOpe
 import java.io.File;
 
 /**
+ * Opens file by thread.
+ * Don't use runOnUiThread !- it's already implemented
+ *
  * Created by Bohdan Pashko on 23.01.17.
  */
-
 public class FileOpenThread extends Thread {
 
     public FileOpenThread(@NonNull final File file, @NonNull final Activity activity,
