@@ -19,7 +19,7 @@ import java.io.InputStreamReader;
 /**
  * Basic reading and writing files.
  * Just for simple files (not PDF or something similar)
- *
+ * <p>
  * Created by Bohdan Pashko on 18.01.17.
  */
 
@@ -35,7 +35,7 @@ public class FileReadingAndWriting implements FileReadWrite {
         StringBuilder text = new StringBuilder();
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file), READING_BUFFER_SIZE);
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file), (int) file.length() / 5);
 
             String line;
             int oldPercent = 0, newPercent;
@@ -44,7 +44,7 @@ public class FileReadingAndWriting implements FileReadWrite {
                 text.append(line);
                 text.append('\n');
 
-                newPercent = (int) ((text.length() * 2) / file.length()); // bytes count (8 bit) = chars count * 2 (16 bit)
+                newPercent = (int) (100.0 * (text.length() * 2) / file.length()); // bytes count (8 bit) = chars count * 2 (16 bit)
                 if (newPercent != oldPercent) {
                     percentSender.refreshPercents(oldPercent, newPercent);
                     oldPercent = newPercent;
@@ -87,7 +87,7 @@ public class FileReadingAndWriting implements FileReadWrite {
                 text.append(line);
                 text.append('\n');
 
-                newPercent = (int) ((text.length() * 2) / file.length()); // bytes count (8 bit) = chars count * 2 (16 bit)
+                newPercent = (int) (100.0 * (text.length() * 2) / file.length()); // bytes count (8 bit) = chars count * 2 (16 bit)
                 percentSender.refreshPercents(currentPercent, newPercent);
                 currentPercent = newPercent;
             }

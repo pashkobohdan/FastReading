@@ -1,11 +1,10 @@
 package com.pashkobohdan.fastreading;
 
 import android.Manifest;
-import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -16,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
@@ -25,7 +23,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.fileSystem.fileReading.InternalStorageFileHelper;
-import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenThread;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.AnyFileOpening;
 import com.pashkobohdan.fastreading.library.lists.booksList.BooksRecyclerViewAdapter;
 
 import java.io.File;
@@ -40,13 +38,13 @@ import static com.pashkobohdan.fastreading.library.fileSystem.fileReading.Intern
 public class MyBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener {
     private static final int PERMISSION_REQUEST_CODE = 1;
 
+    private List<BookInfo> booksInfo;
     private RecyclerView booksRecyclerView;
     private RecyclerView.Adapter booksAdapter;
 
     private FloatingActionsMenu booksFloatingActionsMenu;
     private FloatingActionButton floatingActionButtonOpenFile, floatingActionButtonDownloadBook, floatingActionButtonCreateBook;
 
-    //FloatingActionMenu floatingActionMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,65 +53,19 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        booksFloatingActionsMenu = (FloatingActionsMenu) findViewById(R.id.book_list_fab_menu);
         floatingActionButtonOpenFile = (FloatingActionButton) findViewById(R.id.book_list_open_pdf_fb2_txt_file);
         floatingActionButtonDownloadBook = (FloatingActionButton) findViewById(R.id.book_list_download_book_from_cloud);
         floatingActionButtonCreateBook = (FloatingActionButton) findViewById(R.id.book_list_create_new_book);
 
-
-        floatingActionButtonOpenFile.setOnClickListener(v -> tryOpenFile());
-        floatingActionButtonDownloadBook.setOnClickListener(v -> {
-
-        });
-        floatingActionButtonCreateBook.setOnClickListener(v -> {
-
-        });
+        initFABsListeners();
 
 
         booksRecyclerView = (RecyclerView) findViewById(R.id.books_recycler_view);
         booksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Adapter:
-        List<BookInfo> booksInfo = new LinkedList<>();
-        for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
-            if (file.getName().endsWith(INTERNAL_FILE_EXTENSION)) {
-                booksInfo.add(BookInfoFactory.newInstance(file, this));//new BookInfo(file, this)
-            }
-        }
-        booksAdapter = new BooksRecyclerViewAdapter(this, booksInfo, (bookInfo) -> {
-            Toast.makeText(this, "editing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
-        }, (bookInfo) -> {
-            Toast.makeText(this, "sharing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
-        }, (bookInfo) -> {
-            Toast.makeText(this, "uploading : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
-        }, (bookInfo, ifConfirmed) -> {
-            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        ifConfirmed.run();
-                        break;
+        initBooksListAdapter();
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            };
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Do you want delete this record  : " + bookInfo.getName()).setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener).show();
-        }, (bookInfo) -> {
-            Toast.makeText(this, "click : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
-        }, (bookInfo) -> {
-            Toast.makeText(this, "long click : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
-        });
-        ((BooksRecyclerViewAdapter) booksAdapter).setMode(Attributes.Mode.Single);
-        booksRecyclerView.setAdapter(booksAdapter);
-
-
-        //floatingActionMenu = (FloatingActionMenu)findViewById(R.id.material_design_android_floating_action_menu);
-        /* Listeners */
-        //booksRecyclerView.setOnScrollListener(onScrollListener);
     }
 
     @Override
@@ -144,49 +96,7 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
 
     @Override
     public void onSelect(String path) {
-        File inputFile = new File(path);
-        String bookName = InternalStorageFileHelper.fileNameWithoutExtension(inputFile);
-
-        if (InternalStorageFileHelper.isFileWasOpened(this, inputFile)) {
-
-            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        openFileWithUI(inputFile);
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        break;
-                }
-            };
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Do you want to rewrite this book \"" +
-                    bookName +
-                    "\" ?\nAll reading progress will be removed)")
-                    .setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener)
-                    .show();
-
-        } else {
-            openFileWithUI(inputFile);
-        }
-    }
-
-    private void openFileWithUI(File inputFile){
-        new FileOpenThread(inputFile, this, (o, n) -> {
-            Toast.makeText(this, "reading : " + n, Toast.LENGTH_SHORT).show();
-        }, () -> {
-            Toast.makeText(this, "\t...reading end", Toast.LENGTH_SHORT).show();
-        }, (o, n) -> {
-            Toast.makeText(this, "writing : " + n, Toast.LENGTH_SHORT).show();
-        }, () -> {
-            Toast.makeText(this, "\t...writing end", Toast.LENGTH_SHORT).show();
-        }, (file) -> {
-
-            Toast.makeText(this, "total end, file is null ? - " + (file == null), Toast.LENGTH_SHORT).show();
-
-        }).start();
+        selectOpeningFile(new File(path));
     }
 
 
@@ -225,6 +135,68 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
 
     // business logic functions
 
+
+    private void initFABsListeners() {
+        floatingActionButtonOpenFile.setOnClickListener(v -> {
+            tryOpenFile();
+            booksFloatingActionsMenu.collapse();
+        });
+        floatingActionButtonDownloadBook.setOnClickListener(v -> {
+
+            booksFloatingActionsMenu.collapse();
+        });
+        floatingActionButtonCreateBook.setOnClickListener(v -> {
+
+            booksFloatingActionsMenu.collapse();
+        });
+    }
+
+    private void initBooksListAdapter(){
+
+        booksInfo = new LinkedList<>();
+        for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
+            if (file.getName().endsWith(INTERNAL_FILE_EXTENSION)) {
+                booksInfo.add(BookInfoFactory.newInstance(file, this));//new BookInfo(file, this)
+            }
+        }
+
+
+        booksAdapter = new BooksRecyclerViewAdapter(this, booksInfo, (bookInfo) -> {
+            Toast.makeText(this, "editing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+        }, (bookInfo) -> {
+            Toast.makeText(this, "sharing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+        }, (bookInfo) -> {
+            Toast.makeText(this, "uploading : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+        }, (bookInfo, ifConfirmed) -> {
+            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        if (bookInfo.getFile().delete()) {
+                            ifConfirmed.run();
+                        }
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Do you want delete this record  : " + bookInfo.getName()).setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+        }, (bookInfo) -> {
+            Toast.makeText(this, "click : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+        }, (bookInfo) -> {
+            Toast.makeText(this, "long click : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+        });
+
+
+        ((BooksRecyclerViewAdapter) booksAdapter).setMode(Attributes.Mode.Single);
+        booksRecyclerView.setAdapter(booksAdapter);
+
+    }
+
     private void tryOpenFile() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -235,8 +207,6 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
     }
 
     private void openFileChooserDialog() {
-        //FileChooserDialog.Builder builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, this);
-
         FileChooserDialog.Builder builder =
                 new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, this)
                         .setTitle("Select a file:")
@@ -254,4 +224,105 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
             e.printStackTrace();
         }
     }
+
+    private void selectOpeningFile(File inputFile) {
+        String bookName = InternalStorageFileHelper.fileNameWithoutExtension(inputFile);
+
+        if (InternalStorageFileHelper.isFileWasOpened(this, inputFile)) {
+
+            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        openFileWithUI(inputFile);
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        break;
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Do you want to rewrite this book \"" +
+                    bookName +
+                    "\" ?\nAll reading progress will be removed)")
+                    .setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener)
+                    .show();
+
+        } else {
+            openFileWithUI(inputFile);
+        }
+    }
+
+    private void openFileWithUI(File inputFile) {
+        Activity activity = this;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AnyFileOpening.open(inputFile, activity, (o, n) -> {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Toast.makeText(getBaseContext(), "reading : " + n, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }, () -> {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Toast.makeText(getBaseContext(), "\t...reading end", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }, (o, n) -> {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Toast.makeText(getBaseContext(), "writing : " + n, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }, () -> {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Toast.makeText(getBaseContext(), "\t...writing end", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+            }
+        }).start();
+
+
+//        (o, n) -> {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getBaseContext(), "reading : " + n, Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }, () -> {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getBaseContext(), "\t...reading end", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }, (o, n) -> {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getBaseContext(), "writing : " + n, Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }, () -> {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getBaseContext(), "\t...writing end", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }
+
+    }
+
 }

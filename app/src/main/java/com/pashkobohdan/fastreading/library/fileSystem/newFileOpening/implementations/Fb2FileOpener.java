@@ -1,6 +1,7 @@
 package com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.pashkobohdan.fastreading.library.fileSystem.fileReading.FileReadingAndWriting;
 import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileReadWrite;
@@ -24,6 +25,8 @@ public class Fb2FileOpener implements FileOpen {
         // reading file without encoding
         FileReadWrite readWrite = new FileReadingAndWriting();
 
+        Log.e("FB2 reading", "start 1");
+
         String textWithoutEncoding = readWrite.read(file,
                 (oldPercent, newPercent) -> percentSender.refreshPercents(oldPercent / 2, newPercent / 2));
 
@@ -32,6 +35,7 @@ public class Fb2FileOpener implements FileOpen {
             return null;
         }
 
+        Log.e("FB2 reading", "start 2");
 
         // finding encoding
         if (!textWithoutEncoding.contains("encoding=\"")) {
@@ -51,11 +55,16 @@ public class Fb2FileOpener implements FileOpen {
         }
 
 
+        Log.e("FB2 reading", "start 3");
+
         // open file with encoding
         String encodedText = readWrite.read(file,
                 (oldPercent, newPercent) -> percentSender.refreshPercents(oldPercent / 2 + 50, newPercent / 2 + 50),
                 currentFb2FileCharset);
 
+
+
+        Log.e("FB2 reading", "start 4");
         // find words in text
         StringBuilder results = new StringBuilder();
 

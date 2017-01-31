@@ -52,7 +52,9 @@ public class AnyFileOpening {
      * @param file input file
      * @return text of input file (without excess white spaces)
      */
-    public static File open(@NonNull File file, final @NonNull Activity activity, @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender, @NonNull PercentSender writingPercentSender, @NonNull Runnable writingEndSender) {
+    public static File open(@NonNull File file, final @NonNull Activity activity,
+                            @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender,
+                            @NonNull PercentSender writingPercentSender, @NonNull Runnable writingEndSender) {
         if (!file.canRead() || file.length() < 1) {
             return null;
         }

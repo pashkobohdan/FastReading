@@ -10,7 +10,7 @@ import java.io.File;
 
 /**
  * Opens file by thread.
- * Don't use runOnUiThread !- it's already implemented
+ * Use runOnUiThread !- it's not implemented
  *
  * Created by Bohdan Pashko on 23.01.17.
  */
@@ -22,12 +22,12 @@ public class FileOpenThread extends Thread {
                           @NonNull FileOpenResultSender openResultSender) {
         super(() -> {
             File outputFile = AnyFileOpening.open(file, activity,
-                    (oldValue, neValue) -> activity.runOnUiThread(() -> readingPercentSender.refreshPercents(oldValue, neValue)),
-                    () -> activity.runOnUiThread(readingEnd),
-                    (oldValue, neValue) -> activity.runOnUiThread(() -> writingPercentSender.refreshPercents(oldValue, neValue)),
-                    () -> activity.runOnUiThread(writingEnd));
+                    readingPercentSender,
+                    readingEnd,
+                    writingPercentSender,
+                    writingEnd);
 
-            activity.runOnUiThread(()->openResultSender.send(outputFile));
+            openResultSender.send(outputFile);
         });
     }
 
