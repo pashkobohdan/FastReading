@@ -3,6 +3,7 @@ package com.pashkobohdan.fastreading;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
@@ -24,6 +26,8 @@ import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.fileSystem.fileReading.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.AnyFileOpening;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenResultSender;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenThread;
 import com.pashkobohdan.fastreading.library.lists.booksList.BooksRecyclerViewAdapter;
 
 import java.io.File;
@@ -43,7 +47,9 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
     private RecyclerView.Adapter booksAdapter;
 
     private FloatingActionsMenu booksFloatingActionsMenu;
-    private FloatingActionButton floatingActionButtonOpenFile, floatingActionButtonDownloadBook, floatingActionButtonCreateBook;
+    private FloatingActionButton floatingActionButtonOpenFile,
+            floatingActionButtonDownloadBook,
+            floatingActionButtonCreateBook;
 
 
     @Override
@@ -151,13 +157,11 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         });
     }
 
-    private void initBooksListAdapter(){
+    private void initBooksListAdapter() {
 
         booksInfo = new LinkedList<>();
         for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
-            if (file.getName().endsWith(INTERNAL_FILE_EXTENSION)) {
-                booksInfo.add(BookInfoFactory.newInstance(file, this));//new BookInfo(file, this)
-            }
+            booksInfo.add(BookInfoFactory.newInstance(file, this));
         }
 
 
@@ -254,74 +258,46 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         }
     }
 
-    private void openFileWithUI(File inputFile) {
-        Activity activity = this;
+    private void addNewBookToBooksList(File outputFile) {
+        booksInfo.add(BookInfoFactory.newInstance(outputFile, this));
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                AnyFileOpening.open(inputFile, activity, (o, n) -> {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Toast.makeText(getBaseContext(), "reading : " + n, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }, () -> {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Toast.makeText(getBaseContext(), "\t...reading end", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }, (o, n) -> {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Toast.makeText(getBaseContext(), "writing : " + n, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }, () -> {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Toast.makeText(getBaseContext(), "\t...writing end", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                });
+        booksAdapter.notifyItemInserted(booksInfo.size() - 1);
+    }
+
+    private void openFileWithUI(File inputFile) {
+        final Activity activity = this;
+        final ProgressDialog pd = new ProgressDialog(activity);
+        pd.setTitle("Reading");
+        pd.setMessage("Please, wait");
+        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pd.setMax(100);
+        pd.setProgress(0);
+        pd.setIndeterminate(true);
+        pd.setCancelable(false);
+        pd.show();
+
+        new FileOpenThread(inputFile, this, (o, n) -> {
+            pd.setIndeterminate(false);
+            pd.setProgress(n);
+        }, () -> {
+            pd.dismiss();
+
+            pd.setTitle("Writing");
+            pd.setMessage("Please, wait");
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMax(100);
+            pd.setProgress(0);
+            pd.setIndeterminate(true);
+            pd.setCancelable(false);
+            pd.show();
+        }, (o, n) -> {
+            pd.setIndeterminate(false);
+            pd.setProgress(n);
+        }, pd::dismiss, file -> {
+            if (file != null) {
+                addNewBookToBooksList(file);
             }
         }).start();
-
-
-//        (o, n) -> {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getBaseContext(), "reading : " + n, Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//        }, () -> {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getBaseContext(), "\t...reading end", Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//        }, (o, n) -> {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getBaseContext(), "writing : " + n, Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//        }, () -> {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getBaseContext(), "\t...writing end", Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//        }
 
     }
 

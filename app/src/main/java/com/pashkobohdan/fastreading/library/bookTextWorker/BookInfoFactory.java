@@ -38,7 +38,7 @@ public class BookInfoFactory {
 
         Random random = new Random(System.nanoTime());
         bookInfo.setColor(bookInfo.getBookColorsPreferences().getInt(bookInfo.getName(),
-                Color.argb(255, random.nextInt(255), random.nextInt(255), random.nextInt(255))));
+                Color.argb(255, random.nextInt(127) + 127, random.nextInt(127) + 127, random.nextInt(127) + 127)));
 
 
         return bookInfo;

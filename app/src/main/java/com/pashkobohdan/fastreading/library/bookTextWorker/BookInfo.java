@@ -38,9 +38,6 @@ public class BookInfo {
     private SharedPreferences bookColorsPreferences;
     private SharedPreferences.Editor colorEditor;
 
-    public BookInfo() {
-    }
-
 
     public void readWords(final Runnable readingSuccess, final Runnable readingFailure) {
         new Thread(() -> {
