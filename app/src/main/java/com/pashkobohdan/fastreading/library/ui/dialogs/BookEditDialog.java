@@ -98,21 +98,7 @@ public class BookEditDialog {
             String text = bookText.getEditText().getText().toString();
 
             if (!name.equals(bookInfo.getName()) && name.length() > 0) {
-                if (bookInfo.getFile().renameTo(new File(bookInfo.getFile().getParentFile(), name + InternalStorageFileHelper.INTERNAL_FILE_EXTENSION))) {
-
                     bookInfo.setName(name);
-
-                } else {
-                    new AlertDialog.Builder(activity)
-                            .setPositiveButton("Ok", (dialog, which) -> {
-                            })
-                            .setTitle("Information")
-                            .setMessage("Book with current name is already exist.\nSet another book's name")
-                            .create()
-                            .show();
-
-                    return false;
-                }
             }
 
             if (!author.equals(bookInfo.getAuthor()) && author.length() > 0) {
@@ -130,8 +116,7 @@ public class BookEditDialog {
                 bookInfo.setWords(words);
                 bookInfo.setWordsNumber(words.length);
 
-                ProgressDialog progressDialog = new ProgressDialog(activity);
-
+                // add progressDialog !!!
 
                 new FileReadingAndWriting().write(bookInfo.getFile(), text, (o,n)->{});
             }

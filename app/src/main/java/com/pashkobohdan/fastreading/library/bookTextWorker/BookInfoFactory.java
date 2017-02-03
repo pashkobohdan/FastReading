@@ -11,11 +11,12 @@ import java.util.Random;
 
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_AUTHOR_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_COLOR_PREFERENCE_NAME;
+import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_NAME_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_POSITION_PREFERENCE_NAME;
 
 /**
  * Factory method for construction BookInfo by File and Activity (for get SharedPreference)
- *
+ * <p>
  * Created by Bohdan Pashko on 25.01.17.
  */
 
@@ -25,8 +26,10 @@ public class BookInfoFactory {
         BookInfo bookInfo = new BookInfo();
 
         bookInfo.setFile(file);
-        bookInfo.setName(InternalStorageFileHelper.fileNameWithoutExtension(file));
+        bookInfo.setFileName(InternalStorageFileHelper.fileNameWithoutExtension(file));
 
+        bookInfo.setBookNamesPreferences(activity.getSharedPreferences(BOOKS_NAME_PREFERENCE_NAME,
+                Context.MODE_PRIVATE));
         bookInfo.setBookPositionsPreferences(activity.getSharedPreferences(BOOKS_POSITION_PREFERENCE_NAME,
                 Context.MODE_PRIVATE));
         bookInfo.setBookAuthorsPreferences(activity.getSharedPreferences(BOOKS_AUTHOR_PREFERENCE_NAME,
@@ -34,11 +37,13 @@ public class BookInfoFactory {
         bookInfo.setBookColorsPreferences(activity.getSharedPreferences(BOOKS_COLOR_PREFERENCE_NAME,
                 Context.MODE_PRIVATE));
 
-        bookInfo.setCurrentWordNumber(bookInfo.getBookPositionsPreferences().getInt(bookInfo.getName(), 0));
-        bookInfo.setAuthor(bookInfo.getBookAuthorsPreferences().getString(bookInfo.getName(), "no author"));
+        bookInfo.setName(bookInfo.getBookNamesPreferences().getString(bookInfo.getFileName(),
+                bookInfo.getFileName().length() > 49 ? bookInfo.getFileName().substring(0, 49) : bookInfo.getFileName()));
+        bookInfo.setCurrentWordNumber(bookInfo.getBookPositionsPreferences().getInt(bookInfo.getFileName(), 0));
+        bookInfo.setAuthor(bookInfo.getBookAuthorsPreferences().getString(bookInfo.getFileName(), "no author"));
 
         Random random = new Random(System.nanoTime());
-        bookInfo.setColor(bookInfo.getBookColorsPreferences().getInt(bookInfo.getName(),
+        bookInfo.setColor(bookInfo.getBookColorsPreferences().getInt(bookInfo.getFileName(),
                 Color.argb(255, random.nextInt(127) + 127, random.nextInt(127) + 127, random.nextInt(127) + 127)));
 
 

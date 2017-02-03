@@ -28,7 +28,7 @@
                 android:orientation="vertical"
                 android:id="@+id/dialog_edit_book_books_name"
                 app:counterEnabled="true"
-                app:counterMaxLength="20">
+                app:counterMaxLength="50">
 
                 <EditText
                     android:layout_width="match_parent"
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:counterEnabled="true"
-                app:counterMaxLength="15">
+                app:counterMaxLength="25">
 
                 <EditText
                     android:layout_width="match_parent"

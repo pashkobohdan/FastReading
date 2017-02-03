@@ -22,11 +22,10 @@ public class InternalStorageFileHelper {
     public static String fileNameWithoutExtension(File file) {
         String inputFileName = file.getName();
 
-        String prevName = inputFileName.lastIndexOf(".") > 0 ?
+        return inputFileName.lastIndexOf(".") > 0 ?
                 inputFileName.substring(0, inputFileName.lastIndexOf(".")) :
                 inputFileName;
 
-        return prevName.length() > 19 ? prevName.substring(0, 20) : prevName;
     }
 
     public static boolean isFileWasOpened(Context context, File inputFile) {

@@ -9,18 +9,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
@@ -44,7 +40,6 @@ import static com.pashkobohdan.fastreading.library.fileSystem.file.InternalStora
 public class MyBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener {
     private static final int PERMISSION_REQUEST_CODE = 1;
 
-    //private List<BookInfo> booksInfo;
     private RecyclerView booksRecyclerView;
     private RecyclerView.Adapter booksAdapter;
 
@@ -163,15 +158,11 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
 
     private void initBooksListAdapter() {
 
-        //booksInfo = new LinkedList<>();
         for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
-            //booksInfo.add(BookInfoFactory.newInstance(file, this));
             BookInfosList.add(BookInfoFactory.newInstance(file, this));
         }
 
-
         booksAdapter = new BooksRecyclerViewAdapter(this, BookInfosList.getAll(), (bookInfo) -> {
-            //Toast.makeText(this, "editing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
 
             if (!checkBookReady(bookInfo)) {
                 return;
@@ -180,34 +171,6 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
             new BookEditDialog(this, bookInfo, () -> {
                 booksAdapter.notifyItemChanged(BookInfosList.getAll().indexOf(bookInfo));
             }).show();
-
-//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//            builder.setIcon(R.mipmap.ic_launcher)
-//                    .setTitle("Enter new info:")
-//                    .setView(textEntryView).setPositiveButton("Save",
-//                    (dialog, whichButton) -> {
-//                        String name = bookName.getEditText().getText().toString();
-//                        String author = bookAuthor.getEditText().getText().toString();
-//                        String text = bookText.getEditText().getText().toString();
-//
-//                        if(!name.equals(bookInfo.getName()))
-////
-////                            if (name.equals("") || curator.equals("")) {
-////                                Toast.makeText(getContext(), "Please, enter correct info", Toast.LENGTH_SHORT).show();
-////                                return;
-////                            }
-////
-////                            mSimpleFirechatDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Group");
-////                            group.setNameOfGroup(name);
-////                            group.setCurator(curator);
-////                            mSimpleFirechatDatabaseReference.child(group.getKey()).setValue(group);
-////
-////
-////                            initData();
-//                    }).setNegativeButton("Cancel",
-//                    (dialog, whichButton) -> {
-//                    });
-//            builder.create().show();
 
         }, (bookInfo) -> {
             Toast.makeText(this, "sharing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
@@ -364,7 +327,6 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
     }
 
     private void addNewBookToBooksList(File outputFile) {
-        //booksInfo.add(BookInfoFactory.newInstance(outputFile, this));
         BookInfosList.add(BookInfoFactory.newInstance(outputFile, this));
 
         booksAdapter.notifyItemInserted(BookInfosList.getAll().size() - 1);

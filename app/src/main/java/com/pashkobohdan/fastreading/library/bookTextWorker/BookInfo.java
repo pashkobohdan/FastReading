@@ -12,12 +12,13 @@ import java.io.File;
  */
 
 public class BookInfo {
-    public static final String BOOKS_NAME_PREFERENCE_NAME = "books_positions";
+    public static final String BOOKS_NAME_PREFERENCE_NAME = "books_names";
     public static final String BOOKS_POSITION_PREFERENCE_NAME = "books_positions";
     public static final String BOOKS_AUTHOR_PREFERENCE_NAME = "books_authors";
     public static final String BOOKS_COLOR_PREFERENCE_NAME = "book_colors";
 
     private File file;
+    private String fileName;
 
     private String name;
     private String author;
@@ -33,14 +34,10 @@ public class BookInfo {
     private String allText;
 
 
+    private SharedPreferences bookNamesPreferences;
     private SharedPreferences bookPositionsPreferences;
-    private SharedPreferences.Editor positionEditor;
-
     private SharedPreferences bookAuthorsPreferences;
-    private SharedPreferences.Editor authorEditor;
-
     private SharedPreferences bookColorsPreferences;
-    private SharedPreferences.Editor colorEditor;
 
     private boolean wasRead;
 
@@ -123,13 +120,6 @@ public class BookInfo {
         this.bookPositionsPreferences = bookPositionsPreferences;
     }
 
-    public SharedPreferences.Editor getPositionEditor() {
-        return positionEditor;
-    }
-
-    public void setPositionEditor(SharedPreferences.Editor positionEditor) {
-        this.positionEditor = positionEditor;
-    }
 
     public SharedPreferences getBookAuthorsPreferences() {
         return bookAuthorsPreferences;
@@ -137,22 +127,6 @@ public class BookInfo {
 
     public void setBookAuthorsPreferences(SharedPreferences bookAuthorsPreferences) {
         this.bookAuthorsPreferences = bookAuthorsPreferences;
-    }
-
-    public SharedPreferences.Editor getAuthorEditor() {
-        return authorEditor;
-    }
-
-    public void setAuthorEditor(SharedPreferences.Editor authorEditor) {
-        this.authorEditor = authorEditor;
-    }
-
-    public SharedPreferences.Editor getColorEditor() {
-        return colorEditor;
-    }
-
-    public void setColorEditor(SharedPreferences.Editor colorEditor) {
-        this.colorEditor = colorEditor;
     }
 
     public int getColor() {
@@ -175,46 +149,15 @@ public class BookInfo {
         this.wasRead = wasRead;
     }
 
-    /**
-     * Setters and getters (when changes - write to SharedPreference)
-     */
 
-    public void setName(String name) {
-        if(this.name != null && !name.equals(this.name)){
-            this.name = name;
-
-            setAuthor(author);
-            setColor(color);
-            setCurrentWordNumber(currentWordNumber);
-        }
-
-        this.name = name;
+    public String getFileName() {
+        return fileName;
     }
 
-
-    public void setAuthor(String author) {
-        //if (this.author != null && !this.author.equals(author)) {
-            bookAuthorsPreferences.edit().putString(name, author).apply();
-        //}
-
-        this.author = author;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public void setColor(int color) {
-        //if (this.color != color) {
-            bookColorsPreferences.edit().putInt(name, color).apply();
-        //}
-
-        this.color = color;
-    }
-
-    public void setCurrentWordNumber(int currentWordNumber) {
-        //if (this.currentWordNumber != currentWordNumber) {
-            bookPositionsPreferences.edit().putInt(name, currentWordNumber).apply();
-        //}
-
-        this.currentWordNumber = currentWordNumber;
-    }
 
     public String getAllText() {
         return allText;
@@ -223,4 +166,45 @@ public class BookInfo {
     public void setAllText(String allText) {
         this.allText = allText;
     }
+
+    public SharedPreferences getBookNamesPreferences() {
+        return bookNamesPreferences;
+    }
+
+    public void setBookNamesPreferences(SharedPreferences bookNamesPreferences) {
+        this.bookNamesPreferences = bookNamesPreferences;
+    }
+
+
+    /**
+     * Setters and getters (when changes - write to SharedPreference)
+     */
+
+    public void setName(String name) {
+        if (this.name == null || (name != null && !name.equals(this.name))) {
+            bookNamesPreferences.edit().putString(fileName, name).apply();
+        }
+
+        this.name = name;
+    }
+
+
+    public void setAuthor(String author) {
+        bookAuthorsPreferences.edit().putString(fileName, author).apply();
+
+        this.author = author;
+    }
+
+    public void setColor(int color) {
+        bookColorsPreferences.edit().putInt(fileName, color).apply();
+
+        this.color = color;
+    }
+
+    public void setCurrentWordNumber(int currentWordNumber) {
+        bookPositionsPreferences.edit().putInt(fileName, currentWordNumber).apply();
+
+        this.currentWordNumber = currentWordNumber;
+    }
+
 }
