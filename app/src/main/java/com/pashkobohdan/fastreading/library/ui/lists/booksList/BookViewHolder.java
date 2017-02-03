@@ -1,4 +1,4 @@
-package com.pashkobohdan.fastreading.library.lists.booksList;
+package com.pashkobohdan.fastreading.library.ui.lists.booksList;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

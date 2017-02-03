@@ -2,17 +2,20 @@ package com.pashkobohdan.fastreading.library.bookTextWorker;
 
 import android.content.SharedPreferences;
 
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.FileReadingAndWriting;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileReadWrite;
+import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
 
 import java.io.File;
-import java.util.Random;
 
 /**
- * Created by bohdan on 24.01.17.
+ * Created by Bohdan Pashko on 24.01.17.
  */
 
 public class BookInfo {
+    public static final String BOOKS_NAME_PREFERENCE_NAME = "books_positions";
+    public static final String BOOKS_POSITION_PREFERENCE_NAME = "books_positions";
+    public static final String BOOKS_AUTHOR_PREFERENCE_NAME = "books_authors";
+    public static final String BOOKS_COLOR_PREFERENCE_NAME = "book_colors";
 
     private File file;
 
@@ -27,6 +30,7 @@ public class BookInfo {
      * Sets dynamically (Thread helps).
      */
     private String[] words;
+    private String allText;
 
 
     private SharedPreferences bookPositionsPreferences;
@@ -38,15 +42,22 @@ public class BookInfo {
     private SharedPreferences bookColorsPreferences;
     private SharedPreferences.Editor colorEditor;
 
+    private boolean wasRead;
+
+    public BookInfo() {
+    }
 
     public void readWords(final Runnable readingSuccess, final Runnable readingFailure) {
         new Thread(() -> {
             FileReadWrite fileReadWrite = new FileReadingAndWriting();
-            String bookText = fileReadWrite.read(file, (o, n) -> {});
+            String bookText = fileReadWrite.read(file, (o, n) -> {
+            });
 
             if (bookText == null) {
                 readingFailure.run();
             } else {
+                allText = bookText;
+
                 words = bookText.
                         trim().
                         replaceAll("\\s+", " ").
@@ -56,6 +67,8 @@ public class BookInfo {
                 wordsNumber = words.length;
 
                 readingSuccess.run();
+
+                setWasRead(true);
             }
 
         }).start();
@@ -76,10 +89,6 @@ public class BookInfo {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getAuthor() {
@@ -158,32 +167,60 @@ public class BookInfo {
         this.bookColorsPreferences = bookColorsPreferences;
     }
 
+    public boolean isWasRead() {
+        return wasRead;
+    }
+
+    public void setWasRead(boolean wasRead) {
+        this.wasRead = wasRead;
+    }
 
     /**
      * Setters and getters (when changes - write to SharedPreference)
      */
 
-    public void setAuthor(String author) {
-        if (this.author != null && !this.author.equals(author)) {
-            bookAuthorsPreferences.edit().putString(name, author).apply();
+    public void setName(String name) {
+        if(this.name != null && !name.equals(this.name)){
+            this.name = name;
+
+            setAuthor(author);
+            setColor(color);
+            setCurrentWordNumber(currentWordNumber);
         }
+
+        this.name = name;
+    }
+
+
+    public void setAuthor(String author) {
+        //if (this.author != null && !this.author.equals(author)) {
+            bookAuthorsPreferences.edit().putString(name, author).apply();
+        //}
 
         this.author = author;
     }
 
     public void setColor(int color) {
-        if (this.color != color) {
-            getBookColorsPreferences().edit().putInt(name, color).apply();
-        }
+        //if (this.color != color) {
+            bookColorsPreferences.edit().putInt(name, color).apply();
+        //}
 
         this.color = color;
     }
 
     public void setCurrentWordNumber(int currentWordNumber) {
-        if (this.currentWordNumber != currentWordNumber) {
+        //if (this.currentWordNumber != currentWordNumber) {
             bookPositionsPreferences.edit().putInt(name, currentWordNumber).apply();
-        }
+        //}
 
         this.currentWordNumber = currentWordNumber;
+    }
+
+    public String getAllText() {
+        return allText;
+    }
+
+    public void setAllText(String allText) {
+        this.allText = allText;
     }
 }

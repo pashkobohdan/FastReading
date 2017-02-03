@@ -1,10 +1,10 @@
-package com.pashkobohdan.fastreading.library.fileSystem.fileReading;
+package com.pashkobohdan.fastreading.library.fileSystem.file;
 
 import android.support.annotation.NonNull;
 
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileReadWrite;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileWriteResult;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.PercentSender;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileWriteResult;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

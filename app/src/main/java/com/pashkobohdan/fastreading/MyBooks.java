@@ -5,18 +5,22 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
@@ -24,25 +28,23 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.InternalStorageFileHelper;
-import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.AnyFileOpening;
-import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenResultSender;
+import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
+import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenThread;
-import com.pashkobohdan.fastreading.library.lists.booksList.BooksRecyclerViewAdapter;
+import com.pashkobohdan.fastreading.library.ui.dialogs.BookEditDialog;
+import com.pashkobohdan.fastreading.library.ui.lists.booksList.BooksRecyclerViewAdapter;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
 import ir.sohreco.androidfilechooser.ExternalStorageNotAvailableException;
 import ir.sohreco.androidfilechooser.FileChooserDialog;
 
-import static com.pashkobohdan.fastreading.library.fileSystem.fileReading.InternalStorageFileHelper.INTERNAL_FILE_EXTENSION;
+import static com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper.INTERNAL_FILE_EXTENSION;
 
 public class MyBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener {
     private static final int PERMISSION_REQUEST_CODE = 1;
 
-    private List<BookInfo> booksInfo;
+    //private List<BookInfo> booksInfo;
     private RecyclerView booksRecyclerView;
     private RecyclerView.Adapter booksAdapter;
 
@@ -55,7 +57,9 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_my_books);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -159,14 +163,52 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
 
     private void initBooksListAdapter() {
 
-        booksInfo = new LinkedList<>();
+        //booksInfo = new LinkedList<>();
         for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
-            booksInfo.add(BookInfoFactory.newInstance(file, this));
+            //booksInfo.add(BookInfoFactory.newInstance(file, this));
+            BookInfosList.add(BookInfoFactory.newInstance(file, this));
         }
 
 
-        booksAdapter = new BooksRecyclerViewAdapter(this, booksInfo, (bookInfo) -> {
-            Toast.makeText(this, "editing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+        booksAdapter = new BooksRecyclerViewAdapter(this, BookInfosList.getAll(), (bookInfo) -> {
+            //Toast.makeText(this, "editing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+
+            if (!checkBookReady(bookInfo)) {
+                return;
+            }
+
+            new BookEditDialog(this, bookInfo, () -> {
+                booksAdapter.notifyItemChanged(BookInfosList.getAll().indexOf(bookInfo));
+            }).show();
+
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setIcon(R.mipmap.ic_launcher)
+//                    .setTitle("Enter new info:")
+//                    .setView(textEntryView).setPositiveButton("Save",
+//                    (dialog, whichButton) -> {
+//                        String name = bookName.getEditText().getText().toString();
+//                        String author = bookAuthor.getEditText().getText().toString();
+//                        String text = bookText.getEditText().getText().toString();
+//
+//                        if(!name.equals(bookInfo.getName()))
+////
+////                            if (name.equals("") || curator.equals("")) {
+////                                Toast.makeText(getContext(), "Please, enter correct info", Toast.LENGTH_SHORT).show();
+////                                return;
+////                            }
+////
+////                            mSimpleFirechatDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Group");
+////                            group.setNameOfGroup(name);
+////                            group.setCurator(curator);
+////                            mSimpleFirechatDatabaseReference.child(group.getKey()).setValue(group);
+////
+////
+////                            initData();
+//                    }).setNegativeButton("Cancel",
+//                    (dialog, whichButton) -> {
+//                    });
+//            builder.create().show();
+
         }, (bookInfo) -> {
             Toast.makeText(this, "sharing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
         }, (bookInfo) -> {
@@ -190,15 +232,41 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
             builder.setMessage("Do you want delete this record  : " + bookInfo.getName()).setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }, (bookInfo) -> {
-            Toast.makeText(this, "click : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+
+            if (!checkBookReady(bookInfo)) {
+                return;
+            }
+
+            Intent i = new Intent(this, CurrentBook.class);
+            i.putExtra("serializable_book_file", bookInfo.getFile());
+            startActivity(i);
+
         }, (bookInfo) -> {
+
             Toast.makeText(this, "long click : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+
         });
 
 
         ((BooksRecyclerViewAdapter) booksAdapter).setMode(Attributes.Mode.Single);
         booksRecyclerView.setAdapter(booksAdapter);
 
+    }
+
+    private boolean checkBookReady(BookInfo bookInfo) {
+        if (bookInfo.isWasRead()) {
+            return true;
+        } else {
+            new AlertDialog.Builder(this)
+                    .setPositiveButton("Ok", (dialog, which) -> {
+                    })
+                    .setTitle("Information")
+                    .setMessage("The book has not read yet.\nPlease, wait few second")
+                    .create()
+                    .show();
+
+            return false;
+        }
     }
 
     private void tryOpenFile() {
@@ -258,12 +326,6 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         }
     }
 
-    private void addNewBookToBooksList(File outputFile) {
-        booksInfo.add(BookInfoFactory.newInstance(outputFile, this));
-
-        booksAdapter.notifyItemInserted(booksInfo.size() - 1);
-    }
-
     private void openFileWithUI(File inputFile) {
         final Activity activity = this;
         final ProgressDialog pd = new ProgressDialog(activity);
@@ -301,4 +363,10 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
 
     }
 
+    private void addNewBookToBooksList(File outputFile) {
+        //booksInfo.add(BookInfoFactory.newInstance(outputFile, this));
+        BookInfosList.add(BookInfoFactory.newInstance(outputFile, this));
+
+        booksAdapter.notifyItemInserted(BookInfosList.getAll().size() - 1);
+    }
 }

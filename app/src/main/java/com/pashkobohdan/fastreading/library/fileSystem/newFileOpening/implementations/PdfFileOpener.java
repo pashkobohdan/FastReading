@@ -6,7 +6,7 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
 import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.PercentSender;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.FileOpen;
 
 import java.io.File;

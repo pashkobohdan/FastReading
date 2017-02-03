@@ -3,11 +3,11 @@ package com.pashkobohdan.fastreading.library.fileSystem.newFileOpening;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.FileReadingAndWriting;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileReadWrite;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileWriteResult;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.PercentSender;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.InternalStorageFileHelper;
+import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileWriteResult;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
+import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations.Fb2FileOpener;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations.PdfFileOpener;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations.TxtFileOpener;

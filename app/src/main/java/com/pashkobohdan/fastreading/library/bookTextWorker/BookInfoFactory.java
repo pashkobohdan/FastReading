@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.InternalStorageFileHelper;
+import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 
 import java.io.File;
 import java.util.Random;
+
+import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_AUTHOR_PREFERENCE_NAME;
+import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_COLOR_PREFERENCE_NAME;
+import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_POSITION_PREFERENCE_NAME;
 
 /**
  * Factory method for construction BookInfo by File and Activity (for get SharedPreference)
@@ -16,9 +20,6 @@ import java.util.Random;
  */
 
 public class BookInfoFactory {
-    private static final String BOOKS_POSITION_PREFERENCE_NAME = "books_positions";
-    private static final String BOOKS_AUTHOR_PREFERENCE_NAME = "books_authors";
-    private static final String BOOKS_COLOR_PREFERENCE_NAME = "book_colors";
 
     public static BookInfo newInstance(File file, Activity activity) {
         BookInfo bookInfo = new BookInfo();

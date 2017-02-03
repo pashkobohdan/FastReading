@@ -1,11 +1,10 @@
 package com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.FileReadingAndWriting;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileReadWrite;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.PercentSender;
+import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.FileOpen;
 
 import java.io.File;
@@ -14,7 +13,7 @@ import java.util.regex.Pattern;
 
 /**
  * Opening FB2 files
- *
+ * <p>
  * Created by Bohdan Pashko on 16.01.17.
  */
 public class Fb2FileOpener implements FileOpen {
@@ -25,7 +24,6 @@ public class Fb2FileOpener implements FileOpen {
         // reading file without encoding
         FileReadWrite readWrite = new FileReadingAndWriting();
 
-        Log.e("FB2 reading", "start 1");
 
         String textWithoutEncoding = readWrite.read(file,
                 (oldPercent, newPercent) -> percentSender.refreshPercents(oldPercent / 2, newPercent / 2));
@@ -35,7 +33,6 @@ public class Fb2FileOpener implements FileOpen {
             return null;
         }
 
-        Log.e("FB2 reading", "start 2");
 
         // finding encoding
         if (!textWithoutEncoding.contains("encoding=\"")) {
@@ -54,8 +51,12 @@ public class Fb2FileOpener implements FileOpen {
             return null;
         }
 
+        if (currentFb2FileCharset.toLowerCase().contains("utf-8")) {
+            currentFb2FileCharset = "utf-8";
+        } else if (currentFb2FileCharset.toLowerCase().contains("windows-1251")) {
+            currentFb2FileCharset = "windows-1251";
+        }
 
-        Log.e("FB2 reading", "start 3");
 
         // open file with encoding
         String encodedText = readWrite.read(file,
@@ -63,8 +64,6 @@ public class Fb2FileOpener implements FileOpen {
                 currentFb2FileCharset);
 
 
-
-        Log.e("FB2 reading", "start 4");
         // find words in text
         StringBuilder results = new StringBuilder();
 

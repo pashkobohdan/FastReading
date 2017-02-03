@@ -2,9 +2,9 @@ package com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implement
 
 import android.support.annotation.NonNull;
 
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.FileReadingAndWriting;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.FileReadWrite;
-import com.pashkobohdan.fastreading.library.fileSystem.fileReading.core.PercentSender;
+import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
+import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.FileOpen;
 
 import java.io.File;

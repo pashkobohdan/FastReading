@@ -1,4 +1,4 @@
-package com.pashkobohdan.fastreading.library.lists.booksList;
+package com.pashkobohdan.fastreading.library.ui.lists.booksList;
 
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 

@@ -1,9 +1,7 @@
-package com.pashkobohdan.fastreading.library.lists.booksList;
+package com.pashkobohdan.fastreading.library.ui.lists.booksList;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -120,11 +118,15 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
         viewHolder.getBookName().setText(item.getName());
         viewHolder.getBookAuthor().setText(item.getAuthor());
 
-        item.readWords(() -> {
-            activity.runOnUiThread(() -> viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber()));
-        }, () -> {
-            activity.runOnUiThread(() -> viewHolder.getBookCurrentAndTotalWords().setText("reading error"));
-        });
+        if (item.isWasRead()) {
+            viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber());
+        }else{
+            item.readWords(() -> {
+                activity.runOnUiThread(() -> viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber()));
+            }, () -> {
+                activity.runOnUiThread(() -> viewHolder.getBookCurrentAndTotalWords().setText("reading error"));
+            });
+        }
 
 
         mItemManger.bindView(viewHolder.itemView, position); // was wrote BIND !
