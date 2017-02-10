@@ -1,12 +1,18 @@
 <resources>
 
-    <!-- Base application theme. -->
+    <!-- light theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <!-- dark theme -->
+    <style name="AppTheme.Dark" parent="@android:style/Theme.Holo">
+        <item name="android:windowBackground">@color/black_back</item>
+</style>
+
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -23,6 +29,7 @@
 
 
 
+    <!-- Fab theme (menu items) -->
     <style name="menu_labels_style">
         <item name="android:background">@drawable/fab_label_background</item>
         <item name="android:textColor">@color/white</item>

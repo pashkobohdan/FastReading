@@ -59,10 +59,8 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
     @Override
     public void onBindViewHolder(final BookViewHolder viewHolder, final int position) {
         final BookInfo item = bookInfoList.get(position);
-        viewHolder.setBookInfo(item);
 
         viewHolder.getSwipeLayout().setShowMode(SwipeLayout.ShowMode.PullOut);
-
         viewHolder.getSwipeLayout().setOnClickListener(new View.OnClickListener() {
 
             boolean wasClosed = true;
@@ -120,16 +118,15 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
 
         if (item.isWasRead()) {
             viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber());
-        }else{
-            item.readWords(() -> {
-                activity.runOnUiThread(() -> viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber()));
-            }, () -> {
-                activity.runOnUiThread(() -> viewHolder.getBookCurrentAndTotalWords().setText("reading error"));
-            });
+        } else {
+            item.readWords(() -> activity.runOnUiThread(() ->
+                            viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber())),
+                    () -> activity.runOnUiThread(() ->
+                            viewHolder.getBookCurrentAndTotalWords().setText(R.string.book_list_book_reading_error)));
         }
 
 
-        mItemManger.bindView(viewHolder.itemView, position); // was wrote BIND !
+        mItemManger.bindView(viewHolder.itemView, position);
     }
 
     @Override

@@ -10,7 +10,9 @@ import com.pashkobohdan.fastreading.R;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 
 /**
- * Created by bohdan on 24.01.17.
+ * Holder class for recycler view for Books list
+ *
+ * Created by Bohdan Pashko on 24.01.17.
  */
 public class BookViewHolder extends RecyclerView.ViewHolder {
     private SwipeLayout swipeLayout;
@@ -26,9 +28,6 @@ public class BookViewHolder extends RecyclerView.ViewHolder {
     private TextView buttonDelete;
 
 
-    // data
-    private BookInfo bookInfo;
-
     public BookViewHolder(View itemView) {
         super(itemView);
 
@@ -43,17 +42,6 @@ public class BookViewHolder extends RecyclerView.ViewHolder {
         setButtonShare((TextView) itemView.findViewById(R.id.share_book));
         setButtonUpload((TextView) itemView.findViewById(R.id.upload_book));
         setButtonDelete((TextView) itemView.findViewById(R.id.delete_book));
-
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(view.getContext(), "onItemSelected: " + getBookName().getText().toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void setBookInfo(BookInfo bookInfo) {
-        this.bookInfo = bookInfo;
     }
 
     public SwipeLayout getSwipeLayout() {

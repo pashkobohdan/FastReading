@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.pashkobohdan.fastreading.R;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
@@ -16,43 +18,55 @@ import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileH
 import java.io.File;
 
 /**
- * Created by bohdan on 03.02.17.
+ * Shows dialog when you want change ant book.
+ * Catches exceptions.
+ * <p>
+ * Created by Bohdan Pashko on 03.02.17.
  */
 
 public class BookEditDialog {
 
-    private LayoutInflater factory;
-    private View textEntryView;
-
     private TextInputLayout bookName;
     private TextInputLayout bookAuthor;
-    private TextInputLayout bookText;
+    private EditText bookText;
 
-
-    private AlertDialog.Builder builder;
     private AlertDialog alertDialog;
+
+    private BookInfo bookInfo;
 
 
     public BookEditDialog(final Activity activity, BookInfo bookInfo, Runnable successEdit) {
-        factory = LayoutInflater.from(activity);
-        textEntryView = factory.inflate(R.layout.dialog_edit_book, null);
+        this.bookInfo = bookInfo;
+
+        LayoutInflater factory = LayoutInflater.from(activity);
+        View textEntryView = factory.inflate(R.layout.dialog_edit_book, null);
 
         bookName = (TextInputLayout) textEntryView.findViewById(R.id.dialog_edit_book_books_name);
         bookAuthor = (TextInputLayout) textEntryView.findViewById(R.id.dialog_edit_book_books_author);
-        bookText = (TextInputLayout) textEntryView.findViewById(R.id.dialog_edit_book_books_text);
+        bookText = (EditText) textEntryView.findViewById(R.id.dialog_edit_book_books_text);
 
         bookName.getEditText().setText(bookInfo.getName());
         bookAuthor.getEditText().setText(bookInfo.getAuthor());
-        bookText.getEditText().setText(bookInfo.getAllText());
 
-        builder = new AlertDialog.Builder(activity)
-                .setTitle("Book's editing")
+        // setting book's text
+        ProgressDialog progressDialog = new ProgressDialog(activity);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Please, wait");
+        progressDialog.setMessage("Loading book's text");
+        progressDialog.show();
+
+        bookText.setText(bookInfo.getAllText());
+
+        progressDialog.dismiss();
+        //
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+                //.setTitle("Book's editing")
                 .setPositiveButton("Save", null)
                 .setNegativeButton("Cancel", null)
                 .setView(textEntryView);
 
         alertDialog = builder.create();
-
 
         alertDialog.setOnShowListener(dialog -> {
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
@@ -61,8 +75,6 @@ public class BookEditDialog {
                     dialog.dismiss();
                     successEdit.run();
                 }
-
-                //dialog.dismiss();
             });
 
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(view -> showCancelDialog(activity, dialog));
@@ -95,10 +107,10 @@ public class BookEditDialog {
         try {
             String name = bookName.getEditText().getText().toString();
             String author = bookAuthor.getEditText().getText().toString();
-            String text = bookText.getEditText().getText().toString();
+            String text = bookText.getText().toString();
 
             if (!name.equals(bookInfo.getName()) && name.length() > 0) {
-                    bookInfo.setName(name);
+                bookInfo.setName(name);
             }
 
             if (!author.equals(bookInfo.getAuthor()) && author.length() > 0) {
@@ -107,7 +119,7 @@ public class BookEditDialog {
 
             if (!text.equals(bookInfo.getAllText()) && text.length() > 0) {
                 bookInfo.setAllText(text);
-                String[] words= text.
+                String[] words = text.
                         trim().
                         replaceAll("\\s+", " ").
                         replaceAll("(\\.)+", "\\.").
@@ -118,7 +130,8 @@ public class BookEditDialog {
 
                 // add progressDialog !!!
 
-                new FileReadingAndWriting().write(bookInfo.getFile(), text, (o,n)->{});
+                new FileReadingAndWriting().write(bookInfo.getFile(), text, (o, n) -> {
+                });
             }
 
         } catch (Exception e) {

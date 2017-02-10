@@ -52,35 +52,50 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_my_books);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setTitle("My books");
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
 
         booksFloatingActionsMenu = (FloatingActionsMenu) findViewById(R.id.book_list_fab_menu);
         floatingActionButtonOpenFile = (FloatingActionButton) findViewById(R.id.book_list_open_pdf_fb2_txt_file);
         floatingActionButtonDownloadBook = (FloatingActionButton) findViewById(R.id.book_list_download_book_from_cloud);
         floatingActionButtonCreateBook = (FloatingActionButton) findViewById(R.id.book_list_create_new_book);
 
-        initFABsListeners();
-
 
         booksRecyclerView = (RecyclerView) findViewById(R.id.books_recycler_view);
         booksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+
+        initFABsListeners();
+
+        // if data is already loaded
+        if(BookInfosList.getAll().size() == 0) {
+            initBookInfoDatas();
+        }
+
         initBooksListAdapter();
 
+        Toast.makeText(this, "onCreate", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        Toast.makeText(this, "onStart", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -156,11 +171,14 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         });
     }
 
-    private void initBooksListAdapter() {
-
+    private void initBookInfoDatas() {
         for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
             BookInfosList.add(BookInfoFactory.newInstance(file, this));
         }
+    }
+
+    private void initBooksListAdapter() {
+
 
         booksAdapter = new BooksRecyclerViewAdapter(this, BookInfosList.getAll(), (bookInfo) -> {
 
@@ -168,9 +186,8 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
                 return;
             }
 
-            new BookEditDialog(this, bookInfo, () -> {
-                booksAdapter.notifyItemChanged(BookInfosList.getAll().indexOf(bookInfo));
-            }).show();
+            new BookEditDialog(this, bookInfo, () ->
+                    booksAdapter.notifyItemChanged(BookInfosList.getAll().indexOf(bookInfo))).show();
 
         }, (bookInfo) -> {
             Toast.makeText(this, "sharing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
@@ -215,6 +232,8 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         booksRecyclerView.setAdapter(booksAdapter);
 
     }
+
+
 
     private boolean checkBookReady(BookInfo bookInfo) {
         if (bookInfo.isWasRead()) {

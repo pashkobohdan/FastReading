@@ -6,6 +6,7 @@ import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWritin
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by Bohdan Pashko on 24.01.17.
@@ -46,28 +47,33 @@ public class BookInfo {
 
     public void readWords(final Runnable readingSuccess, final Runnable readingFailure) {
         new Thread(() -> {
-            FileReadWrite fileReadWrite = new FileReadingAndWriting();
-            String bookText = fileReadWrite.read(file, (o, n) -> {
-            });
+            try {
+                FileReadWrite fileReadWrite = new FileReadingAndWriting();
+                String bookText = fileReadWrite.read(file, (o, n) -> {
+                });
 
-            if (bookText == null) {
+                if (bookText == null) {
+                    readingFailure.run();
+                } else {
+                    allText = bookText;
+
+                    words = bookText.
+                            trim().
+                            replaceAll("\\s+", " ").
+                            replaceAll("(\\.)+", "\\.").
+                            split(" ");
+
+                    wordsNumber = words.length;
+
+                    readingSuccess.run();
+
+                    setWasRead(true);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+
                 readingFailure.run();
-            } else {
-                allText = bookText;
-
-                words = bookText.
-                        trim().
-                        replaceAll("\\s+", " ").
-                        replaceAll("(\\.)+", "\\.").
-                        split(" ");
-
-                wordsNumber = words.length;
-
-                readingSuccess.run();
-
-                setWasRead(true);
             }
-
         }).start();
     }
 

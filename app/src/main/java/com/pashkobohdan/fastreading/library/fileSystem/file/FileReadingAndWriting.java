@@ -34,8 +34,10 @@ public class FileReadingAndWriting implements FileReadWrite {
 
         StringBuilder text = new StringBuilder();
 
+        BufferedReader bufferedReader = null;
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file), (int) file.length() / 5);
+            FileReader fileReader = new FileReader(file);
+            bufferedReader = new BufferedReader(fileReader, (int) file.length() / 5);
 
             String line;
             int oldPercent = 0, newPercent;
@@ -51,12 +53,19 @@ public class FileReadingAndWriting implements FileReadWrite {
                 }
             }
 
-            bufferedReader.close();
-
+            fileReader.close();
         } catch (IOException e) {
             e.printStackTrace();
 
             return null;
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return text.length() < 1 ? null : new String(text);
