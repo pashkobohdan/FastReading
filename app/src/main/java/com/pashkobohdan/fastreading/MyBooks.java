@@ -57,7 +57,7 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if(getSupportActionBar()!=null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("My books");
             getSupportActionBar().setHomeButtonEnabled(true);
         }
@@ -75,27 +75,21 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         initFABsListeners();
 
         // if data is already loaded
-        if(BookInfosList.getAll().size() == 0) {
+        if (BookInfosList.getAll().size() == 0) {
             initBookInfoDatas();
         }
 
         initBooksListAdapter();
-
-        Toast.makeText(this, "onCreate", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        Toast.makeText(this, "onStart", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -232,7 +226,6 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         booksRecyclerView.setAdapter(booksAdapter);
 
     }
-
 
 
     private boolean checkBookReady(BookInfo bookInfo) {
