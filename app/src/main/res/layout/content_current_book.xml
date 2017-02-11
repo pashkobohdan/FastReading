@@ -24,7 +24,7 @@
             android:orientation="horizontal">
 
             <SeekBar
-                android:id="@+id/seekBar"
+                android:id="@+id/current_book_current_position_seek_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -65,12 +65,14 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/current_book_left_part"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="left" />
 
 
                         <TextView
+                            android:id="@+id/current_book_center_part"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="center" />
@@ -86,6 +88,7 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/current_book_right_part"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="right" />
@@ -111,50 +114,47 @@
             android:orientation="horizontal">
 
 
-            <Button
-                android:id="@+id/button2"
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/current_book_speed_forward_back"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/book_playing_control_button"
-                android:text="f back"
                 android:textColor="@color/white" />
 
 
-            <Button
-                android:id="@+id/button3"
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/current_book_speed_back"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/book_playing_control_button"
-                android:text="back"
                 android:textColor="@color/white" />
 
 
             <TextView
-                android:id="@+id/textView4"
+                android:gravity="center"
+                android:id="@+id/current_book_current_speed"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="100"
+                android:layout_height="match_parent"
+                android:text="160"
                 android:textColor="@color/white" />
 
-            <Button
-                android:id="@+id/button4"
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/current_book_speed_up"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/book_playing_control_button"
-                android:text="forward"
                 android:textColor="@color/white" />
 
 
-            <Button
-                android:id="@+id/button5"
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/current_book_speed_forward_up"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/book_playing_control_button"
-                android:text="f forward"
                 android:textColor="@color/white" />
 
         </LinearLayout>

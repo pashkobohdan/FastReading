@@ -126,7 +126,6 @@ public class BookEditDialog {
                         split(" ");
 
                 bookInfo.setWords(words);
-                bookInfo.setWordsNumber(words.length);
 
                 // add progressDialog !!!
 

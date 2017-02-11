@@ -117,10 +117,10 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
         viewHolder.getBookAuthor().setText(item.getAuthor());
 
         if (item.isWasRead()) {
-            viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber());
+            viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWords().length);
         } else {
             item.readWords(() -> activity.runOnUiThread(() ->
-                            viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWordsNumber())),
+                            viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWords().length)),
                     () -> activity.runOnUiThread(() ->
                             viewHolder.getBookCurrentAndTotalWords().setText(R.string.book_list_book_reading_error)));
         }

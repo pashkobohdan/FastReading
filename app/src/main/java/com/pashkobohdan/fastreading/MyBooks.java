@@ -230,6 +230,17 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
 
     private boolean checkBookReady(BookInfo bookInfo) {
         if (bookInfo.isWasRead()) {
+            if (bookInfo.getWords().length < 1) {
+                new AlertDialog.Builder(this)
+                        .setPositiveButton("Ok", (dialog, which) -> {
+                        })
+                        .setTitle("Information")
+                        .setMessage("This book is empty. Try delete book and open again")
+                        .create()
+                        .show();
+
+                return false;
+            }
             return true;
         } else {
             new AlertDialog.Builder(this)
@@ -305,7 +316,7 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         final Activity activity = this;
         final ProgressDialog pd = new ProgressDialog(activity);
         pd.setTitle("Reading");
-        pd.setMessage("Please, wait");
+        pd.setMessage("Please, wait while book loading.\nYou can use another apps at this time");
         pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         pd.setMax(100);
         pd.setProgress(0);

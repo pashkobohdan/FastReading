@@ -37,4 +37,9 @@ public class Word {
     public void setRightPart(String rightPart) {
         this.rightPart = rightPart;
     }
+
+    @Override
+    public String toString() {
+        return leftPart + centerLetter + rightPart;
+    }
 }

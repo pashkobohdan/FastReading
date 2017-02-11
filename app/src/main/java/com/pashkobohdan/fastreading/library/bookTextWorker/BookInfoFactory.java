@@ -11,6 +11,7 @@ import java.util.Random;
 
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_AUTHOR_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_COLOR_PREFERENCE_NAME;
+import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_CURRENT_SPEED_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_NAME_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_POSITION_PREFERENCE_NAME;
 
@@ -36,6 +37,8 @@ public class BookInfoFactory {
                 Context.MODE_PRIVATE));
         bookInfo.setBookColorsPreferences(activity.getSharedPreferences(BOOKS_COLOR_PREFERENCE_NAME,
                 Context.MODE_PRIVATE));
+        bookInfo.setBookSpeedsPreferences(activity.getSharedPreferences(BOOKS_CURRENT_SPEED_PREFERENCE_NAME,
+                Context.MODE_PRIVATE));
 
         bookInfo.setName(bookInfo.getBookNamesPreferences().getString(bookInfo.getFileName(),
                 bookInfo.getFileName().length() > 49 ? bookInfo.getFileName().substring(0, 49) : bookInfo.getFileName()));
@@ -45,6 +48,8 @@ public class BookInfoFactory {
         Random random = new Random(System.nanoTime());
         bookInfo.setColor(bookInfo.getBookColorsPreferences().getInt(bookInfo.getFileName(),
                 Color.argb(255, random.nextInt(127) + 127, random.nextInt(127) + 127, random.nextInt(127) + 127)));
+
+        bookInfo.setCurrentSpeed(bookInfo.getBookSpeedsPreferences().getInt(bookInfo.getFileName(), 80));
 
 
         return bookInfo;

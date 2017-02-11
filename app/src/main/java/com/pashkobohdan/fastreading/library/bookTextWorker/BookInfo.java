@@ -17,6 +17,7 @@ public class BookInfo {
     public static final String BOOKS_POSITION_PREFERENCE_NAME = "books_positions";
     public static final String BOOKS_AUTHOR_PREFERENCE_NAME = "books_authors";
     public static final String BOOKS_COLOR_PREFERENCE_NAME = "book_colors";
+    public static final String BOOKS_CURRENT_SPEED_PREFERENCE_NAME = "book_speeds";
 
     private File file;
     private String fileName;
@@ -24,8 +25,8 @@ public class BookInfo {
     private String name;
     private String author;
     private int color;
-    private int wordsNumber;
-    private int currentWordNumber = -1;
+    private int currentWordNumber;
+    private int currentSpeed;
 
 
     /**
@@ -39,6 +40,7 @@ public class BookInfo {
     private SharedPreferences bookPositionsPreferences;
     private SharedPreferences bookAuthorsPreferences;
     private SharedPreferences bookColorsPreferences;
+    private SharedPreferences bookSpeedsPreferences;
 
     private boolean wasRead;
 
@@ -62,8 +64,6 @@ public class BookInfo {
                             replaceAll("\\s+", " ").
                             replaceAll("(\\.)+", "\\.").
                             split(" ");
-
-                    wordsNumber = words.length;
 
                     readingSuccess.run();
 
@@ -96,14 +96,6 @@ public class BookInfo {
 
     public String getAuthor() {
         return author;
-    }
-
-    public int getWordsNumber() {
-        return wordsNumber;
-    }
-
-    public void setWordsNumber(int wordsNumber) {
-        this.wordsNumber = wordsNumber;
     }
 
     public int getCurrentWordNumber() {
@@ -181,6 +173,17 @@ public class BookInfo {
         this.bookNamesPreferences = bookNamesPreferences;
     }
 
+    public SharedPreferences getBookSpeedsPreferences() {
+        return bookSpeedsPreferences;
+    }
+
+    public void setBookSpeedsPreferences(SharedPreferences bookSpeedsPreferences) {
+        this.bookSpeedsPreferences = bookSpeedsPreferences;
+    }
+
+    public int getCurrentSpeed() {
+        return currentSpeed;
+    }
 
     /**
      * Setters and getters (when changes - write to SharedPreference)
@@ -213,4 +216,9 @@ public class BookInfo {
         this.currentWordNumber = currentWordNumber;
     }
 
+    public void setCurrentSpeed(int currentSpeed) {
+        bookSpeedsPreferences.edit().putInt(fileName, currentSpeed).apply();
+
+        this.currentSpeed = currentSpeed;
+    }
 }
