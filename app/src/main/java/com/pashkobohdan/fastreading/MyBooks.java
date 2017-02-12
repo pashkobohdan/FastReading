@@ -363,8 +363,6 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
             return true;
         } else {
             new AlertDialog.Builder(this)
-                    .setPositiveButton("Ok", (dialog, which) -> {
-                    })
                     .setTitle("Information")
                     .setMessage("The book has not read yet.\nPlease, wait few second")
                     .create()

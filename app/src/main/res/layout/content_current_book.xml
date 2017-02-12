@@ -21,10 +21,16 @@
             android:id="@+id/current_book_top_manage_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <SeekBar
                 android:id="@+id/current_book_current_position_seek_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:gravity="center"
+                android:id="@+id/current_book_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -125,6 +131,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
+                    android:background="@drawable/book_forward_prev_word_button"
                     android:textColor="@color/white" />
             </RelativeLayout>
 
@@ -139,6 +146,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
+                    android:background="@drawable/book_prev_word_button"
                     android:textColor="@color/white" />
             </RelativeLayout>
 
@@ -176,6 +184,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
+                    android:background="@drawable/book_forward_next_word_button"
                     android:textColor="@color/white" />
             </RelativeLayout>
 

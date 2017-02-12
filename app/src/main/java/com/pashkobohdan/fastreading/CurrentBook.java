@@ -3,7 +3,6 @@ package com.pashkobohdan.fastreading;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -22,16 +21,15 @@ import android.widget.TextView;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
 import com.pashkobohdan.fastreading.library.bookTextWorker.Word;
+import com.pashkobohdan.fastreading.library.ui.button.ButtonContinuesClickAction;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.os.Handler;
-import android.widget.Toast;
 
 
 import static android.view.KeyEvent.KEYCODE_BACK;
@@ -39,6 +37,12 @@ import static android.view.KeyEvent.KEYCODE_VOLUME_DOWN;
 import static android.view.KeyEvent.KEYCODE_VOLUME_UP;
 
 public class CurrentBook extends AppCompatActivity {
+    public static final double TIME_DELTA_LONG_WORDS = 1.5;
+    public static final int RESTART_TIMER_TASK_ONLINE = -1;
+    public static final int SPEED_CHANGE_STEP = 20;
+    public static final int SPEED_MIN_VALUE = 20;
+    public static final int SPEED_MAX_VALUE = 1500;
+
     enum ReadingStatus {
         STATUS_PLAYING,
         STATUS_PAUSE
@@ -50,6 +54,7 @@ public class CurrentBook extends AppCompatActivity {
     private LinearLayout topManagePanel, bottomManagePanel;
     private RelativeLayout readingPanel;
     private SeekBar currentPositionSeekBar;
+    private TextView currentBookProgress;
     private TextView currentWordLeftPart, currentWordCenterPart, currentWordRightPart, currentSpeed;
     private ImageButton positionForwardBack, positionBack, positionUp, positionForwardUp;
 
@@ -77,6 +82,7 @@ public class CurrentBook extends AppCompatActivity {
         readingPanel = (RelativeLayout) findViewById(R.id.current_book_reading_space);
 
         currentPositionSeekBar = (SeekBar) findViewById(R.id.current_book_current_position_seek_bar);
+        currentBookProgress = (TextView) findViewById(R.id.current_book_progress);
         currentWordLeftPart = (TextView) findViewById(R.id.current_book_left_part);
         currentWordCenterPart = (TextView) findViewById(R.id.current_book_center_part);
         currentWordRightPart = (TextView) findViewById(R.id.current_book_right_part);
@@ -86,8 +92,8 @@ public class CurrentBook extends AppCompatActivity {
         positionUp = (ImageButton) findViewById(R.id.current_book_speed_up);
         positionForwardUp = (ImageButton) findViewById(R.id.current_book_speed_forward_up);
 
-        topBoundaryLine = (TextView)findViewById(R.id.current_book_top_boundary_line);
-        bottomBoundaryLine = (TextView)findViewById(R.id.current_book_bottom_boundary_line);
+        topBoundaryLine = (TextView) findViewById(R.id.current_book_top_boundary_line);
+        bottomBoundaryLine = (TextView) findViewById(R.id.current_book_bottom_boundary_line);
 
         // set actionBar
         setSupportActionBar((Toolbar) findViewById(R.id.current_book_toolbar));
@@ -126,6 +132,124 @@ public class CurrentBook extends AppCompatActivity {
          */
         refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean showBoundaryLines = preferences.getBoolean("boundary_lines", true);
+        boolean anotherCenterColor = preferences.getBoolean("another_center_color", true);
+        int wordColor = preferences.getInt("word_color", getResources().getColor(R.color.word_color_default));
+        int centerLetterColor = preferences.getInt("center_letter_color", getResources().getColor(R.color.center_letter_color_default));
+        int textSize = Integer.parseInt(preferences.getString("text_size", "20"));
+
+        if (showBoundaryLines) {
+            topBoundaryLine.setVisibility(View.VISIBLE);
+            bottomBoundaryLine.setVisibility(View.VISIBLE);
+        } else {
+            topBoundaryLine.setVisibility(View.GONE);
+            bottomBoundaryLine.setVisibility(View.GONE);
+        }
+
+        currentWordLeftPart.setTextColor(wordColor);
+        currentWordRightPart.setTextColor(wordColor);
+
+        if (anotherCenterColor) {
+            currentWordCenterPart.setTextColor(centerLetterColor);
+        } else {
+            currentWordCenterPart.setTextColor(wordColor);
+        }
+
+        currentWordLeftPart.setTextSize(textSize);
+        currentWordCenterPart.setTextSize(textSize);
+        currentWordRightPart.setTextSize(textSize);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        bookInfo.setCurrentWordNumber(readingPosition);
+        refreshStatus(ReadingStatus.STATUS_PAUSE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        refreshStatus(ReadingStatus.STATUS_PAUSE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        refreshStatus(ReadingStatus.STATUS_PAUSE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_current_book, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //tryExitToBookList();
+                finish();
+                break;
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KEYCODE_VOLUME_DOWN:
+                bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() > SPEED_MIN_VALUE ?
+                        bookInfo.getCurrentSpeed() - SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
+                currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
+                startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
+
+                return true;
+
+            case KEYCODE_VOLUME_UP:
+                bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() < SPEED_MAX_VALUE ?
+                        bookInfo.getCurrentSpeed() + SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
+                currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
+                startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
+                return true;
+
+
+            case KEYCODE_BACK:
+                //tryExitToBookList();
+                finish();
+                break;
+
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    /**
+     *  Business logic
+     */
 
     private boolean getBookInfo() {
         Intent i = getIntent();
@@ -166,14 +290,6 @@ public class CurrentBook extends AppCompatActivity {
     }
 
     private void initializeListeners() {
-        positionForwardBack.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toast.makeText(CurrentBook.this, "LONG !!!", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-
         readingPanel.setOnClickListener(v -> {
             if (currentReadingStatus == ReadingStatus.STATUS_PAUSE) {
                 refreshStatus(ReadingStatus.STATUS_PLAYING);
@@ -182,7 +298,7 @@ public class CurrentBook extends AppCompatActivity {
             }
         });
 
-        positionForwardBack.setOnClickListener(v -> {
+        ButtonContinuesClickAction.setContinuesClickAction(positionForwardBack, () -> {
             int position;
             for (position = readingPosition - 2; position >= 0; position--) {
                 if (bookInfo.getWords()[position].endsWith(".") ||
@@ -193,14 +309,17 @@ public class CurrentBook extends AppCompatActivity {
                 }
             }
 
-            setReadingPosition(position == 0 ? 0 : position + 1);
-        });
-        positionBack.setOnClickListener(v ->
-                setReadingPosition(getReadingPosition() == 0 ? 0 : getReadingPosition() - 1));
-        positionUp.setOnClickListener(v ->
+            setReadingPosition(position <= 0 ? 0 : position + 1);
+        }, 200);
+
+        ButtonContinuesClickAction.setContinuesClickAction(positionBack,
+                () -> setReadingPosition(getReadingPosition() == 0 ? 0 : getReadingPosition() - 1), 200);
+
+        ButtonContinuesClickAction.setContinuesClickAction(positionUp, () ->
                 setReadingPosition(getReadingPosition() ==
-                        bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : getReadingPosition() + 1));
-        positionForwardUp.setOnClickListener(v -> {
+                        bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : getReadingPosition() + 1), 200);
+
+        ButtonContinuesClickAction.setContinuesClickAction(positionForwardUp, () -> {
             int position;
             for (position = readingPosition + 1; position < bookInfo.getWords().length; position++) {
                 if (bookInfo.getWords()[position].endsWith(".") ||
@@ -211,8 +330,8 @@ public class CurrentBook extends AppCompatActivity {
                 }
             }
 
-            setReadingPosition(position == bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : position + 1);
-        });
+            setReadingPosition(position >= bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : position + 1);
+        }, 200);
 
         currentPositionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -255,7 +374,7 @@ public class CurrentBook extends AppCompatActivity {
                         refreshStatus(ReadingStatus.STATUS_PAUSE);
                     } else {
                         if (words.get(getReadingPosition()).toString().length() > 10) {
-                            startOfRestartPlaying((int) (1500.0 / bookInfo.getCurrentSpeed()));
+                            startOfRestartPlaying((int) (6000.0 * TIME_DELTA_LONG_WORDS / bookInfo.getCurrentSpeed()));
                         }
                     }
 
@@ -295,7 +414,9 @@ public class CurrentBook extends AppCompatActivity {
         initializeTimerTask();
         timer = new Timer();
 
-        timer.schedule(timerTask, initialDelay, (int) (60000.0 / bookInfo.getCurrentSpeed()));
+        timer.schedule(timerTask, initialDelay == -1 ?
+                        (int) (60000.0 / bookInfo.getCurrentSpeed()) : initialDelay,
+                (int) (60000.0 / bookInfo.getCurrentSpeed()));
     }
 
     private void stopPlaying() {
@@ -313,121 +434,6 @@ public class CurrentBook extends AppCompatActivity {
                 .setNegativeButton("No", (dialog, which) -> {
                 })
                 .show();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean showBoundaryLines = preferences.getBoolean("boundary_lines", true);
-        boolean anotherCenterColor = preferences.getBoolean("another_center_color", true);
-        int wordColor = preferences.getInt("word_color", getResources().getColor(R.color.word_color_default));
-        int centerLetterColor = preferences.getInt("center_letter_color", getResources().getColor(R.color.center_letter_color_default));
-        int textSize = Integer.parseInt(preferences.getString("text_size", "20"));
-
-        if(showBoundaryLines){
-            topBoundaryLine.setVisibility(View.VISIBLE);
-            bottomBoundaryLine.setVisibility(View.VISIBLE);
-        }else{
-            topBoundaryLine.setVisibility(View.GONE);
-            bottomBoundaryLine.setVisibility(View.GONE);
-        }
-
-        currentWordLeftPart.setTextColor(wordColor);
-        currentWordRightPart.setTextColor(wordColor);
-
-        if(anotherCenterColor) {
-            currentWordCenterPart.setTextColor(centerLetterColor);
-        }else{
-            currentWordCenterPart.setTextColor(wordColor);
-        }
-
-        currentWordLeftPart.setTextSize(textSize);
-        currentWordCenterPart.setTextSize(textSize);
-        currentWordRightPart.setTextSize(textSize);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        bookInfo.setCurrentWordNumber(readingPosition);
-        refreshStatus(ReadingStatus.STATUS_PAUSE);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        refreshStatus(ReadingStatus.STATUS_PAUSE);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        refreshStatus(ReadingStatus.STATUS_PAUSE);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_current_book, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                //tryExitToBookList();
-                finish();
-                break;
-            case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KEYCODE_VOLUME_DOWN:
-                bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() >= 40 ? bookInfo.getCurrentSpeed() - 20 : bookInfo.getCurrentSpeed());
-                //Toast.makeText(this, "volume down", Toast.LENGTH_SHORT).show();
-
-                currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
-
-                return true;
-
-            case KEYCODE_VOLUME_UP:
-                bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() <= 1580 ? bookInfo.getCurrentSpeed() + 20 : bookInfo.getCurrentSpeed());
-
-                currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
-
-                //Toast.makeText(this, "volume up : ", Toast.LENGTH_SHORT).show();
-                return true;
-
-
-            case KEYCODE_BACK:
-                //tryExitToBookList();
-                finish();
-                break;
-
-        }
-
-        return super.onKeyDown(keyCode, event);
     }
 
 
@@ -453,5 +459,7 @@ public class CurrentBook extends AppCompatActivity {
         currentWordLeftPart.setText(currentWord.getLeftPart());
         currentWordCenterPart.setText(currentWord.getCenterLetter());
         currentWordRightPart.setText(currentWord.getRightPart());
+
+        currentBookProgress.setText(readingPosition + 1 + " / " + words.size());
     }
 }
