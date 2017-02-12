@@ -1,6 +1,7 @@
 package com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread;
 
-import java.io.File;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
+
 
 /**
  * Created by Bohdan Pashko on 24.01.17.
@@ -8,6 +9,6 @@ import java.io.File;
 @FunctionalInterface
 public interface FileOpenResultSender {
 
-    void send(File file);
+    void send(AnyBookOpeningResult file);
 
 }

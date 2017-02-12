@@ -1,24 +1,20 @@
 package com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
-import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
-import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
+import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.FileOpen;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
@@ -29,73 +25,56 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class Fb2FileOpener implements FileOpen {
 
     @Override
-    public String open(@NonNull File file, @NonNull PercentSender percentSender, @NonNull Runnable readingEndSender) {
+    public BookReadingResult open(@NonNull File file, @NonNull PercentSender percentSender, @NonNull Runnable readingEndSender) {
 
         // reading file without encoding
-        FileReadWrite readWrite = new FileReadingAndWriting();
-
-
-        String textWithoutEncoding = readWrite.read(file,
-                (oldPercent, newPercent) -> percentSender.refreshPercents(oldPercent / 2, newPercent / 2));
-
-
-        if (textWithoutEncoding == null) {
-            return null;
-        }
-
-
-        // finding encoding
-        if (!textWithoutEncoding.contains("encoding=\"")) {
-            return null;
-        }
-
-        Pattern pattern = Pattern.compile("encoding=\"(.*)\"");
-        Matcher matcher = pattern.matcher(textWithoutEncoding);
-        String currentFb2FileCharset = null;
-
-        if (matcher.find()) {
-            currentFb2FileCharset = matcher.group(1);
-        }
-
-        if (currentFb2FileCharset == null) {
-            return null;
-        }
-
-        if (currentFb2FileCharset.toLowerCase().contains("utf-8")) {
-            currentFb2FileCharset = "utf-8";
-        } else if (currentFb2FileCharset.toLowerCase().contains("windows-1251")) {
-            currentFb2FileCharset = "windows-1251";
-        }
-
-
-        // open file with encoding
-        String encodedText = readWrite.read(file,
-                (oldPercent, newPercent) -> percentSender.refreshPercents(oldPercent / 2 + 50, newPercent / 2 + 50),
-                currentFb2FileCharset);
-
-
-//        try {
-//
-//            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//            DocumentBuilder builder = factory.newDocumentBuilder();
-//            Document document = builder.parse(new InputSource(new StringReader(encodedText)));
-//            Element rootElement = document.getDocumentElement();
+        percentSender.refreshPercents(0, 0);
+//        FileReadWrite readWrite = new FileReadingAndWriting();
 //
 //
-//            readingEndSender.run();
+//        String textWithoutEncoding = readWrite.read(file,
+//                (oldPercent, newPercent) -> percentSender.refreshPercents(oldPercent / 2, newPercent / 2));
 //
-//            return getTexts("p", rootElement).replaceAll("<a.*>.*</a>", "")
-//                    .trim()
-//                    .replaceAll("\\s+", " ")
-//                    .replaceAll("(\\.)+", "\\.");
 //
-//        } catch (Exception e) {
-//            e.printStackTrace();
+//        if (textWithoutEncoding == null) {
+//            return null;
 //        }
+//
+//
+//        // finding encoding
+//        if (!textWithoutEncoding.contains("encoding=\"")) {
+//            return null;
+//        }
+//
+//        Pattern pattern = Pattern.compile("encoding=\"(.*)\"");
+//        Matcher matcher = pattern.matcher(textWithoutEncoding);
+//        String currentFb2FileCharset = null;
+//
+//        if (matcher.find()) {
+//            currentFb2FileCharset = matcher.group(1);
+//        }
+//
+//        if (currentFb2FileCharset == null) {
+//            return null;
+//        }
+//
+//        if (currentFb2FileCharset.toLowerCase().contains("utf-8")) {
+//            currentFb2FileCharset = "utf-8";
+//        } else if (currentFb2FileCharset.toLowerCase().contains("windows-1251")) {
+//            currentFb2FileCharset = "windows-1251";
+//        }
+//
+//
+//        // open file with encoding
+//        String encodedText = readWrite.read(file,
+//                (oldPercent, newPercent) -> percentSender.refreshPercents(oldPercent / 2 + 50, newPercent / 2 + 50),
+//                currentFb2FileCharset);
 
 
         // find words in text
         StringBuilder results = new StringBuilder();
+        String bookName = InternalStorageFileHelper.fileNameWithoutExtension(file);
+        String bookAuthor = "";
 
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -115,29 +94,21 @@ public class Fb2FileOpener implements FileOpen {
                     results.append(". ");
                 }
             }
+
+            NodeList name = doc.getElementsByTagName("book-title");
+            if (name != null && name.getLength() > 0) {
+                bookName = ((Element) name.item(0)).getTextContent();
+            }
+
+            bookAuthor = getAuthor(doc);
+
         } catch (Exception e) {
             e.printStackTrace();
 
             results = new StringBuilder("empty book");
         }
 
-//        pattern = Pattern.compile("<p>(.+?)</p>");
-//        matcher = pattern.matcher(encodedText);
-//
-//        while (matcher.find()) {
-//            String foundString = matcher.group(1).trim();
-//
-//            if (foundString.endsWith("\\.") ||
-//                    foundString.endsWith("!") ||
-//                    foundString.endsWith("?") ||
-//                    foundString.endsWith(":")) {
-//                results.append(foundString);
-//                results.append(" ");
-//            } else {
-//                results.append(foundString);
-//                results.append(". ");
-//            }
-//        }
+        percentSender.refreshPercents(0, 100);
 
 
         String resultText = new String(results);
@@ -151,28 +122,41 @@ public class Fb2FileOpener implements FileOpen {
         }
 
         readingEndSender.run();
-        return resultText;
+        return new BookReadingResult(resultText, bookName, bookAuthor);
 
     }
 
-    protected String getTexts(String tagName, Element element) {
-        NodeList list = element.getElementsByTagName(tagName);
-        if (list != null && list.getLength() > 0) {
-            StringBuilder result = new StringBuilder();
+    private String getAuthor(Document document) {
+        String resultAuthor = "";
 
-            for (int i = 0; i < list.getLength(); i++) {
-                NodeList subList = list.item(i).getChildNodes();
+        Node allTitleInfo = document.getElementsByTagName("title-info").item(0);
 
-                if (subList != null && subList.getLength() > 0) {
-                    result.append(subList.item(i).getNodeValue());
+        NodeList titleInfo = allTitleInfo.getChildNodes();
+        for (int a = 0; a < titleInfo.getLength(); a++) {
+            if (titleInfo.item(a).getNodeName().equals("author")) {
+
+                Node author = titleInfo.item(a);
+
+                NodeList authorValues = author.getChildNodes();
+                if (authorValues.getLength() == 0) {
+                    resultAuthor += author.getTextContent() + " ";
+                } else {
+                    for (int j = 0; j < authorValues.getLength(); j++) {
+                        Node element = authorValues.item(j);
+
+                        if (element.getNodeName().equals("first-name") ||
+                                element.getNodeName().equals("last-name") ||
+                                element.getNodeName().equals("middle-name")) {
+                            resultAuthor += element.getTextContent() + " ";
+                        }
+                    }
                 }
             }
 
-            return new String(result);
-
         }
 
-        return null;
+
+        return resultAuthor;
     }
 
 }

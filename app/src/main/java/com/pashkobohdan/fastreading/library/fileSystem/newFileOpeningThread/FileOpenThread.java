@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.AnyFileOpening;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
 
 import java.io.File;
 
@@ -21,7 +22,7 @@ public class FileOpenThread extends Thread {
                           @NonNull PercentSender writingPercentSender, @NonNull Runnable writingEnd,
                           @NonNull FileOpenResultSender fileOpeningEnd) {
         super(() -> {
-            File outputFile = AnyFileOpening.open(file, activity,
+            AnyBookOpeningResult outputFile = AnyFileOpening.open(file, activity,
                     (oldValue, neValue) -> activity.runOnUiThread(() -> readingPercentSender.refreshPercents(oldValue, neValue)),
                     () -> activity.runOnUiThread(readingEnd),
                     (oldValue, neValue) -> activity.runOnUiThread(() -> writingPercentSender.refreshPercents(oldValue, neValue)),

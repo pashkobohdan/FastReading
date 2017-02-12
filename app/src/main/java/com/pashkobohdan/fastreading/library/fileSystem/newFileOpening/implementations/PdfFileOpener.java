@@ -6,7 +6,9 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
 import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
+import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.FileOpen;
 
 import java.io.File;
@@ -20,7 +22,7 @@ import java.io.IOException;
 
 public class PdfFileOpener implements FileOpen {
     @Override
-    public String open(@NonNull File file, @NonNull PercentSender percentSender, @NonNull Runnable readingEndSender) {
+    public BookReadingResult open(@NonNull File file, @NonNull PercentSender percentSender, @NonNull Runnable readingEndSender) {
 
         try {
             PdfReader pdfReader = new PdfReader(file.getAbsolutePath());
@@ -63,7 +65,7 @@ public class PdfFileOpener implements FileOpen {
             }
 
             readingEndSender.run();
-            return resultText;
+            return new BookReadingResult(resultText, InternalStorageFileHelper.fileNameWithoutExtension(file), "");
 
         } catch (IOException e) {
             e.printStackTrace();

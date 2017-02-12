@@ -3,8 +3,10 @@ package com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implement
 import android.support.annotation.NonNull;
 
 import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
+import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.FileOpen;
 
 import java.io.File;
@@ -19,7 +21,7 @@ public class TxtFileOpener implements FileOpen {
 
 
     @Override
-    public String open(@NonNull File file, @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender) {
+    public BookReadingResult open(@NonNull File file, @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender) {
 
         FileReadWrite fileReadWrite = new FileReadingAndWriting();
 
@@ -36,7 +38,7 @@ public class TxtFileOpener implements FileOpen {
 
 
         readingEndSender.run();
-        return fileText;
+        return new BookReadingResult(fileText, InternalStorageFileHelper.fileNameWithoutExtension(file), "");
 
     }
 }

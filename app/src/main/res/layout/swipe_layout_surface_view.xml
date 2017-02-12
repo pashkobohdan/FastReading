@@ -13,10 +13,10 @@
 
 
     <RelativeLayout
-        android:padding="4dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@+id/book_pic_name">
+        android:layout_toRightOf="@+id/book_pic_name"
+        android:padding="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,11 +25,12 @@
             android:orientation="vertical">
 
             <TextView
-                android:maxLines="1"
                 android:id="@+id/book_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:maxLines="1"
+                android:ellipsize="marquee"
+                android:text="Book's text"
                 android:textSize="20dp" />
 
             <LinearLayout
@@ -37,25 +38,27 @@
                 android:layout_height="wrap_content">
 
                 <RelativeLayout
-                    android:layout_margin="2dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp">
 
                     <TextView
-                        android:maxLines="1"
                         android:id="@+id/book_author"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_toLeftOf="@+id/book_current_position"
+                        android:ellipsize="marquee"
+                        android:maxLines="1"
                         android:text="TextView"
                         android:textSize="10dp" />
 
-
                     <TextView
-                        android:maxLines="1"
                         android:id="@+id/book_current_position"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
+                        android:maxLines="1"
                         android:text="refreshing ..."
                         android:textSize="10dp" />
                 </RelativeLayout>

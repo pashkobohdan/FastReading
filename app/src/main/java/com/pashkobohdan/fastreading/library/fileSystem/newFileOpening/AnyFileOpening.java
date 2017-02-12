@@ -8,6 +8,8 @@ import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileWriteResult;
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.PercentSender;
 import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations.Fb2FileOpener;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations.PdfFileOpener;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.implementations.TxtFileOpener;
@@ -18,7 +20,7 @@ import java.io.File;
 
 /**
  * Opening any file, which set in FileType enum
- *
+ * <p>
  * Created by Bohdan Pashko on 16.01.17.
  */
 
@@ -46,15 +48,15 @@ public class AnyFileOpening {
 
     /**
      * Reading any file with extension from FileType enum.
-     *
+     * <p>
      * Don't forget, check existing of this file in internal path (method InternalStorageFileHelper.isFileWasOpened)
      *
      * @param file input file
      * @return text of input file (without excess white spaces)
      */
-    public static File open(@NonNull File file, final @NonNull Activity activity,
-                            @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender,
-                            @NonNull PercentSender writingPercentSender, @NonNull Runnable writingEndSender) {
+    public static AnyBookOpeningResult open(@NonNull File file, final @NonNull Activity activity,
+                                            @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender,
+                                            @NonNull PercentSender writingPercentSender, @NonNull Runnable writingEndSender) {
         if (!file.canRead() || file.length() < 1) {
             return null;
         }
@@ -78,8 +80,8 @@ public class AnyFileOpening {
 
 
         // checking output text
-        String fileText = fileOpen.open(file, readingPercentSender, readingEndSender);
-        if (fileText == null || fileText.length() < 1) {
+        BookReadingResult bookOpeningResult = fileOpen.open(file, readingPercentSender, readingEndSender);
+        if (bookOpeningResult == null || bookOpeningResult.getBookText().length() < 1) {
             return null;
         }
 
@@ -90,12 +92,12 @@ public class AnyFileOpening {
         }
 
         // writing text to output file
-        FileWriteResult fileWriteResult = fileReadWrite.write(outputFile, fileText, writingPercentSender);
+        FileWriteResult fileWriteResult = fileReadWrite.write(outputFile, bookOpeningResult.getBookText(), writingPercentSender);
         if (fileWriteResult != FileWriteResult.SUCCESS) {
             return null;
         }
         writingEndSender.run();
 
-        return outputFile;
+        return new AnyBookOpeningResult(bookOpeningResult, outputFile);
     }
 }

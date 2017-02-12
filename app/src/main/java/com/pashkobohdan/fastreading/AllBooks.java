@@ -26,6 +26,8 @@ import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
 import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenThread;
 import com.pashkobohdan.fastreading.library.ui.dialogs.BookEditDialog;
 import com.pashkobohdan.fastreading.library.ui.lists.booksList.BooksRecyclerViewAdapter;
@@ -40,7 +42,7 @@ import ir.sohreco.androidfilechooser.FileChooserDialog;
 
 import static com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper.INTERNAL_FILE_EXTENSION;
 
-public class MyBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener {
+public class AllBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener {
 
     private static final int PERMISSION_REQUEST_CODE = 1;
 
@@ -458,16 +460,16 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
         }, (o, n) -> {
             pd.setIndeterminate(false);
             pd.setProgress(n);
-        }, pd::dismiss, file -> {
-            if (file != null) {
-                addNewBookToBooksList(file);
+        }, pd::dismiss, bookOpeningResult -> {
+            if (bookOpeningResult != null) {
+                addNewBookToBooksList(bookOpeningResult);
             }
         }).start();
 
     }
 
-    private void addNewBookToBooksList(File outputFile) {
-        BookInfosList.add(BookInfoFactory.newInstance(outputFile, this));
+    private void addNewBookToBooksList(AnyBookOpeningResult bookOpeningResult) {
+        BookInfosList.add(BookInfoFactory.createNewInstance(bookOpeningResult, this));
 
         booksAdapter.notifyItemInserted(BookInfosList.getAll().size() - 1);
     }

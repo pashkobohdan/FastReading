@@ -22,6 +22,6 @@ public interface FileOpen {
      * @param readingEndSender     for sending reading end event
      * @return null - if reading canceled or reading failure
      */
-    String open(@NonNull File file, @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender);
+    BookReadingResult open(@NonNull File file, @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender);
 
 }

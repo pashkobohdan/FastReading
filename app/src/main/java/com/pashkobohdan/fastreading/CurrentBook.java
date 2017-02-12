@@ -42,6 +42,7 @@ public class CurrentBook extends AppCompatActivity {
     public static final int SPEED_CHANGE_STEP = 20;
     public static final int SPEED_MIN_VALUE = 20;
     public static final int SPEED_MAX_VALUE = 1500;
+    public static final int REWIND_WORD_DELAY = 100;
 
     enum ReadingStatus {
         STATUS_PLAYING,
@@ -68,6 +69,9 @@ public class CurrentBook extends AppCompatActivity {
     private Timer timer;
     private TimerTask timerTask;
     private Handler handler = new Handler();
+
+    private boolean isUserRewind = false;
+    private int lastPositionBeforeRewind = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,10 +212,24 @@ public class CurrentBook extends AppCompatActivity {
                 //tryExitToBookList();
                 finish();
                 break;
+
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
+
+            case R.id.action_to_start:
+                lastPositionBeforeRewind = readingPosition;
+                setReadingPosition(0);
+                isUserRewind = true;
+                break;
+
+            case R.id.action_cancel_last_rewind :
+                if(isUserRewind) {
+                    setReadingPosition(lastPositionBeforeRewind);
+                }
+                break;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -310,14 +328,14 @@ public class CurrentBook extends AppCompatActivity {
             }
 
             setReadingPosition(position <= 0 ? 0 : position + 1);
-        }, 200);
+        }, REWIND_WORD_DELAY);
 
         ButtonContinuesClickAction.setContinuesClickAction(positionBack,
-                () -> setReadingPosition(getReadingPosition() == 0 ? 0 : getReadingPosition() - 1), 200);
+                () -> setReadingPosition(getReadingPosition() == 0 ? 0 : getReadingPosition() - 1), REWIND_WORD_DELAY);
 
         ButtonContinuesClickAction.setContinuesClickAction(positionUp, () ->
                 setReadingPosition(getReadingPosition() ==
-                        bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : getReadingPosition() + 1), 200);
+                        bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : getReadingPosition() + 1), REWIND_WORD_DELAY);
 
         ButtonContinuesClickAction.setContinuesClickAction(positionForwardUp, () -> {
             int position;
@@ -331,19 +349,24 @@ public class CurrentBook extends AppCompatActivity {
             }
 
             setReadingPosition(position >= bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : position + 1);
-        }, 200);
+        }, REWIND_WORD_DELAY);
 
         currentPositionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     setReadingPosition(progress);
+
+                    isUserRewind = true;
+                }else{
+                    isUserRewind = false;
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 stopPlaying();
+                lastPositionBeforeRewind = seekBar.getProgress();
             }
 
             @Override
