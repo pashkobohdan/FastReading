@@ -44,9 +44,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/current_book_top_boundary_line"
                     android:layout_width="match_parent"
                     android:layout_height="1px"
-                    android:background="@color/black_back" />
+                    android:background="@color/black" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -98,9 +99,10 @@
 
 
                 <TextView
+                    android:id="@+id/current_book_bottom_boundary_line"
                     android:layout_width="match_parent"
                     android:layout_height="1px"
-                    android:background="@color/black_back" />
+                    android:background="@color/black" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -113,49 +115,69 @@
             android:background="@color/colorPrimary"
             android:orientation="horizontal">
 
-
-            <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/current_book_speed_forward_back"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/book_playing_control_button"
-                android:textColor="@color/white" />
+                android:layout_weight="1">
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/current_book_speed_forward_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
 
 
-            <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/current_book_speed_back"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/book_playing_control_button"
-                android:textColor="@color/white" />
+                android:layout_weight="1">
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/current_book_speed_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
 
 
             <TextView
-                android:gravity="center"
                 android:id="@+id/current_book_current_speed"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:gravity="center"
                 android:text="160"
                 android:textColor="@color/white" />
 
-            <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/current_book_speed_up"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/book_playing_control_button"
-                android:textColor="@color/white" />
+                android:layout_weight="1">
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/current_book_speed_up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/book_next_word_button"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
 
 
-            <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/current_book_speed_forward_up"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/book_playing_control_button"
-                android:textColor="@color/white" />
+                android:layout_weight="1">
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/current_book_speed_forward_up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
 
         </LinearLayout>
 

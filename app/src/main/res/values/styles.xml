@@ -10,7 +10,7 @@
 
     <!-- dark theme -->
     <style name="AppTheme.Dark" parent="@android:style/Theme.Holo">
-        <item name="android:windowBackground">@color/black_back</item>
+        <item name="android:windowBackground">@color/black</item>
 </style>
 
 

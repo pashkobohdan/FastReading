@@ -1,35 +1,55 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="night_mode"
+        android:summary="For reading in the evening. Don't forget change word color."
+        android:title="Night mode" />
 
     <SwitchPreference
         android:defaultValue="true"
-        android:key="example_switch"
-        android:summary="@string/pref_description_social_recommendations"
-        android:title="@string/pref_title_social_recommendations" />
+        android:key="boundary_lines"
+        android:summary="For better focusing on word"
+        android:title="Enable boundary lines" />
 
-    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
-    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
-    <EditTextPreference
-        android:capitalize="words"
-        android:defaultValue="@string/pref_default_display_name"
-        android:inputType="textCapWords"
-        android:key="example_text"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/pref_title_display_name" />
+    <!--vertical line !!!-->
+    <!--<SwitchPreference-->
+    <!--android:defaultValue="true"-->
+    <!--android:key="example_switch"-->
+    <!--android:summary="For better focusing on word"-->
+    <!--android:title="Enable boundary lines" />-->
 
-    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
-         dismiss it. -->
-    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
-        android:defaultValue="-1"
-        android:entries="@array/pref_example_list_titles"
-        android:entryValues="@array/pref_example_list_values"
-        android:key="example_list"
+        android:defaultValue="20"
+        android:entries="@array/pref_text_size_values"
+        android:entryValues="@array/pref_text_size_values"
+        android:key="text_size"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="@string/pref_title_add_friends_to_messages" />
+        android:title="Text size" />
 
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="another_center_color"
+        android:summary="Set enable to choose color of center letter"
+        android:title="Another color of center letter of word" />
+
+    <com.jrummyapps.android.colorpicker.ColorPreference
+        android:defaultValue="@color/center_letter_color_default"
+        android:key="center_letter_color"
+        android:summary="Color of center part of word"
+        android:title="Center letter color"
+        app:colorShape="circle"
+        android:dependency="another_center_color"/>
+
+    <com.jrummyapps.android.colorpicker.ColorPreference
+        android:defaultValue="@color/word_color_default"
+        android:key="word_color"
+        android:summary="Color of left and right part of word"
+        android:title="Word color"
+        app:colorShape="circle" />
 
 
 </PreferenceScreen>

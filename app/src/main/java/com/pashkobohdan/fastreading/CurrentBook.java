@@ -2,6 +2,9 @@ package com.pashkobohdan.fastreading;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +31,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.os.Handler;
+import android.widget.Toast;
 
 
 import static android.view.KeyEvent.KEYCODE_BACK;
@@ -48,6 +52,8 @@ public class CurrentBook extends AppCompatActivity {
     private SeekBar currentPositionSeekBar;
     private TextView currentWordLeftPart, currentWordCenterPart, currentWordRightPart, currentSpeed;
     private ImageButton positionForwardBack, positionBack, positionUp, positionForwardUp;
+
+    private TextView topBoundaryLine, bottomBoundaryLine;
 
     private volatile ReadingStatus currentReadingStatus;
     private ArrayList<Word> words;
@@ -80,6 +86,8 @@ public class CurrentBook extends AppCompatActivity {
         positionUp = (ImageButton) findViewById(R.id.current_book_speed_up);
         positionForwardUp = (ImageButton) findViewById(R.id.current_book_speed_forward_up);
 
+        topBoundaryLine = (TextView)findViewById(R.id.current_book_top_boundary_line);
+        bottomBoundaryLine = (TextView)findViewById(R.id.current_book_bottom_boundary_line);
 
         // set actionBar
         setSupportActionBar((Toolbar) findViewById(R.id.current_book_toolbar));
@@ -158,6 +166,14 @@ public class CurrentBook extends AppCompatActivity {
     }
 
     private void initializeListeners() {
+        positionForwardBack.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(CurrentBook.this, "LONG !!!", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
         readingPanel.setOnClickListener(v -> {
             if (currentReadingStatus == ReadingStatus.STATUS_PAUSE) {
                 refreshStatus(ReadingStatus.STATUS_PLAYING);
@@ -168,7 +184,7 @@ public class CurrentBook extends AppCompatActivity {
 
         positionForwardBack.setOnClickListener(v -> {
             int position;
-            for (position = readingPosition - 1; position >= 0; position--) {
+            for (position = readingPosition - 2; position >= 0; position--) {
                 if (bookInfo.getWords()[position].endsWith(".") ||
                         bookInfo.getWords()[position].endsWith("?") ||
                         bookInfo.getWords()[position].endsWith("!") ||
@@ -307,6 +323,34 @@ public class CurrentBook extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean showBoundaryLines = preferences.getBoolean("boundary_lines", true);
+        boolean anotherCenterColor = preferences.getBoolean("another_center_color", true);
+        int wordColor = preferences.getInt("word_color", getResources().getColor(R.color.word_color_default));
+        int centerLetterColor = preferences.getInt("center_letter_color", getResources().getColor(R.color.center_letter_color_default));
+        int textSize = Integer.parseInt(preferences.getString("text_size", "20"));
+
+        if(showBoundaryLines){
+            topBoundaryLine.setVisibility(View.VISIBLE);
+            bottomBoundaryLine.setVisibility(View.VISIBLE);
+        }else{
+            topBoundaryLine.setVisibility(View.GONE);
+            bottomBoundaryLine.setVisibility(View.GONE);
+        }
+
+        currentWordLeftPart.setTextColor(wordColor);
+        currentWordRightPart.setTextColor(wordColor);
+
+        if(anotherCenterColor) {
+            currentWordCenterPart.setTextColor(centerLetterColor);
+        }else{
+            currentWordCenterPart.setTextColor(wordColor);
+        }
+
+        currentWordLeftPart.setTextSize(textSize);
+        currentWordCenterPart.setTextSize(textSize);
+        currentWordRightPart.setTextSize(textSize);
     }
 
     @Override
