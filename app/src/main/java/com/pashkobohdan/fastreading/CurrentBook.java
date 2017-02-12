@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -21,6 +22,8 @@ import com.pashkobohdan.fastreading.library.bookTextWorker.Word;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -101,12 +104,18 @@ public class CurrentBook extends AppCompatActivity {
          *  Here's all right !
          */
 
+        //refresh book's last opening date (time)
+        bookInfo.setLastOpeningDate((int) (new Date().getTime() / 1000));
+
         parseWords();
 
         initializeStartReadingVaules();
 
         initializeListeners();
 
+        /**
+         *  current status - PAUSE
+         */
         refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
 
@@ -141,7 +150,7 @@ public class CurrentBook extends AppCompatActivity {
     }
 
     private void initializeStartReadingVaules() {
-        currentPositionSeekBar.setMax(words.size()- 1);
+        currentPositionSeekBar.setMax(words.size() - 1);
 
         setReadingPosition(bookInfo.getCurrentWordNumber());
 
@@ -192,7 +201,7 @@ public class CurrentBook extends AppCompatActivity {
         currentPositionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
+                if (fromUser) {
                     setReadingPosition(progress);
                 }
             }
@@ -220,7 +229,7 @@ public class CurrentBook extends AppCompatActivity {
 
                     if (getReadingPosition() < words.size() - 1) {
                         setReadingPosition(getReadingPosition() + 1);
-                    }else{
+                    } else {
                         showBookEndDialog();
                         // book is already end !
                         // restart book (dialog) !
@@ -280,12 +289,13 @@ public class CurrentBook extends AppCompatActivity {
         }
     }
 
-    private void showBookEndDialog(){
+    private void showBookEndDialog() {
         new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setMessage("Book end. Do you want to start again ?")
                 .setPositiveButton("Ok", (dialog, which) -> setReadingPosition(0))
-                .setNegativeButton("No", (dialog, which) -> {})
+                .setNegativeButton("No", (dialog, which) -> {
+                })
                 .show();
     }
 
@@ -322,13 +332,25 @@ public class CurrentBook extends AppCompatActivity {
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_current_book, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        if (id == android.R.id.home) {
-            tryExitToBookList();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //tryExitToBookList();
+                finish();
+                break;
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -355,7 +377,8 @@ public class CurrentBook extends AppCompatActivity {
 
 
             case KEYCODE_BACK:
-                tryExitToBookList();
+                //tryExitToBookList();
+                finish();
                 break;
 
         }
@@ -364,14 +387,14 @@ public class CurrentBook extends AppCompatActivity {
     }
 
 
-    private void tryExitToBookList() {
-        new AlertDialog.Builder(this)
-                .setMessage("Do you want to go back ?")
-                .setPositiveButton("Yes", (dialog, which) -> finish())
-                .setNegativeButton("No", (dialog, which) -> {
-                })
-                .show();
-    }
+//    private void tryExitToBookList() {
+//        new AlertDialog.Builder(this)
+//                .setMessage("Do you want to go back ?")
+//                .setPositiveButton("Yes", (dialog, which) -> finish())
+//                .setNegativeButton("No", (dialog, which) -> {
+//                })
+//                .show();
+//    }
 
     public int getReadingPosition() {
         return readingPosition;

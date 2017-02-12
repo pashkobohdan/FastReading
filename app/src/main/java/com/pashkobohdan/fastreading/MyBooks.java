@@ -31,6 +31,9 @@ import com.pashkobohdan.fastreading.library.ui.dialogs.BookEditDialog;
 import com.pashkobohdan.fastreading.library.ui.lists.booksList.BooksRecyclerViewAdapter;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 import ir.sohreco.androidfilechooser.ExternalStorageNotAvailableException;
 import ir.sohreco.androidfilechooser.FileChooserDialog;
@@ -38,6 +41,7 @@ import ir.sohreco.androidfilechooser.FileChooserDialog;
 import static com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper.INTERNAL_FILE_EXTENSION;
 
 public class MyBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener {
+
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     private RecyclerView booksRecyclerView;
@@ -47,6 +51,18 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
     private FloatingActionButton floatingActionButtonOpenFile,
             floatingActionButtonDownloadBook,
             floatingActionButtonCreateBook;
+
+
+    enum BooksSortTypes {
+        BY_LAST_OPENING,
+        BY_PROGRESS,
+        BY_NAME,
+        BY_BACK_NAME,
+        BY_AUTHOR,
+        BY_BACK_AUTHOR
+    }
+
+    BooksSortTypes booksSortType = BooksSortTypes.BY_LAST_OPENING;
 
 
     @Override
@@ -79,7 +95,9 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
             initBookInfoDatas();
         }
 
-        initBooksListAdapter();
+        if (booksAdapter == null) {
+            initBooksListAdapter();
+        }
     }
 
     @Override
@@ -90,6 +108,8 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
     @Override
     protected void onResume() {
         super.onResume();
+
+        refreshBookList();
     }
 
     @Override
@@ -133,15 +153,68 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+
+            case R.id.action_sort_by_last_open:
+                if (!item.isChecked()) {
+                    booksSortType = BooksSortTypes.BY_LAST_OPENING;
+                    refreshBookList();
+                    item.setChecked(true);
+                }
+
+                return true;
+
+            case R.id.action_sort_by_progress:
+                if (!item.isChecked()) {
+                    booksSortType = BooksSortTypes.BY_PROGRESS;
+                    refreshBookList();
+                    item.setChecked(true);
+                }
+
+                return true;
+
+
+            case R.id.action_sort_by_name:
+                if (!item.isChecked()) {
+                    booksSortType = BooksSortTypes.BY_NAME;
+                    refreshBookList();
+                    item.setChecked(true);
+                }
+
+                return true;
+
+            case R.id.action_back_sort_by_name:
+                if (!item.isChecked()) {
+                    booksSortType = BooksSortTypes.BY_BACK_NAME;
+                    refreshBookList();
+                    item.setChecked(true);
+                }
+
+                return true;
+
+            case R.id.action_sort_by_author:
+                if (!item.isChecked()) {
+                    booksSortType = BooksSortTypes.BY_AUTHOR;
+                    refreshBookList();
+                    item.setChecked(true);
+                }
+
+                return true;
+
+            case R.id.action_back_sort_by_author:
+                if (!item.isChecked()) {
+                    booksSortType = BooksSortTypes.BY_BACK_AUTHOR;
+                    refreshBookList();
+                    item.setChecked(true);
+                }
+
+                return true;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -149,6 +222,52 @@ public class MyBooks extends AppCompatActivity implements FileChooserDialog.Choo
 
     // business logic functions
 
+    private void refreshBookList() {
+        switch (booksSortType) {
+            case BY_LAST_OPENING:
+                Collections.sort(BookInfosList.getAll(), (o1, o2) ->
+                        Integer.valueOf(o2.getLastOpeningDate()).compareTo(o1.getLastOpeningDate())
+                );
+                break;
+
+            case BY_PROGRESS:
+                Collections.sort(BookInfosList.getAll(), (o2, o1) -> {
+                            if (!o1.isWasRead()) {
+                                if (!o2.isWasRead()) {
+                                    return 0;
+                                }
+                                return -1;
+                            } else {
+                                if (!o2.isWasRead()) {
+                                    return 1;
+                                } else {
+                                    return Integer.valueOf((int) (100.0 * o1.getCurrentWordNumber() / o1.getWords().length))
+                                            .compareTo((int) (100.0 * o2.getCurrentWordNumber() / o2.getWords().length));
+                                }
+                            }
+                        }
+                );
+                break;
+
+            case BY_NAME:
+                Collections.sort(BookInfosList.getAll(), (o1, o2) -> o1.getName().compareTo(o2.getName()));
+                break;
+
+            case BY_BACK_NAME:
+                Collections.sort(BookInfosList.getAll(), (o1, o2) -> o2.getName().compareTo(o1.getName()));
+                break;
+
+            case BY_AUTHOR:
+                Collections.sort(BookInfosList.getAll(), (o1, o2) -> o1.getAuthor().compareTo(o2.getAuthor()));
+                break;
+
+            case BY_BACK_AUTHOR:
+                Collections.sort(BookInfosList.getAll(), (o1, o2) -> o2.getAuthor().compareTo(o1.getAuthor()));
+                break;
+        }
+
+        booksAdapter.notifyDataSetChanged();
+    }
 
     private void initFABsListeners() {
         floatingActionButtonOpenFile.setOnClickListener(v -> {

@@ -7,6 +7,7 @@ import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileReadWrite;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by Bohdan Pashko on 24.01.17.
@@ -18,6 +19,7 @@ public class BookInfo {
     public static final String BOOKS_AUTHOR_PREFERENCE_NAME = "books_authors";
     public static final String BOOKS_COLOR_PREFERENCE_NAME = "book_colors";
     public static final String BOOKS_CURRENT_SPEED_PREFERENCE_NAME = "book_speeds";
+    public static final String BOOKS_LAST_OPEN_DATE_PREFERENCE_NAME = "book_last_open_date";
 
     private File file;
     private String fileName;
@@ -28,6 +30,7 @@ public class BookInfo {
     private int currentWordNumber;
     private int currentSpeed;
 
+    private int lastOpeningDate;
 
     /**
      * Sets dynamically (Thread helps).
@@ -41,6 +44,7 @@ public class BookInfo {
     private SharedPreferences bookAuthorsPreferences;
     private SharedPreferences bookColorsPreferences;
     private SharedPreferences bookSpeedsPreferences;
+    private SharedPreferences bookLastOpenDatePreferences;
 
     private boolean wasRead;
 
@@ -185,6 +189,19 @@ public class BookInfo {
         return currentSpeed;
     }
 
+
+    public int getLastOpeningDate() {
+        return lastOpeningDate;
+    }
+
+
+    public SharedPreferences getBookLastOpenDatePreferences() {
+        return bookLastOpenDatePreferences;
+    }
+
+    public void setBookLastOpenDatePreferences(SharedPreferences bookLastOpenDatePreferences) {
+        this.bookLastOpenDatePreferences = bookLastOpenDatePreferences;
+    }
     /**
      * Setters and getters (when changes - write to SharedPreference)
      */
@@ -221,4 +238,11 @@ public class BookInfo {
 
         this.currentSpeed = currentSpeed;
     }
+
+    public void setLastOpeningDate(int lastOpeningDate) {
+        bookLastOpenDatePreferences.edit().putInt(fileName, lastOpeningDate).apply();
+
+        this.lastOpeningDate = lastOpeningDate;
+    }
+
 }

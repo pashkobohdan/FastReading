@@ -7,11 +7,13 @@ import android.graphics.Color;
 import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Random;
 
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_AUTHOR_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_COLOR_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_CURRENT_SPEED_PREFERENCE_NAME;
+import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_LAST_OPEN_DATE_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_NAME_PREFERENCE_NAME;
 import static com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo.BOOKS_POSITION_PREFERENCE_NAME;
 
@@ -39,6 +41,10 @@ public class BookInfoFactory {
                 Context.MODE_PRIVATE));
         bookInfo.setBookSpeedsPreferences(activity.getSharedPreferences(BOOKS_CURRENT_SPEED_PREFERENCE_NAME,
                 Context.MODE_PRIVATE));
+        bookInfo.setBookLastOpenDatePreferences(activity.getSharedPreferences(BOOKS_LAST_OPEN_DATE_PREFERENCE_NAME,
+                Context.MODE_PRIVATE));
+
+
 
         bookInfo.setName(bookInfo.getBookNamesPreferences().getString(bookInfo.getFileName(),
                 bookInfo.getFileName().length() > 49 ? bookInfo.getFileName().substring(0, 49) : bookInfo.getFileName()));
@@ -50,6 +56,7 @@ public class BookInfoFactory {
                 Color.argb(255, random.nextInt(127) + 127, random.nextInt(127) + 127, random.nextInt(127) + 127)));
 
         bookInfo.setCurrentSpeed(bookInfo.getBookSpeedsPreferences().getInt(bookInfo.getFileName(), 80));
+        bookInfo.setLastOpeningDate(bookInfo.getBookLastOpenDatePreferences().getInt(bookInfo.getFileName(), 0));
 
 
         return bookInfo;

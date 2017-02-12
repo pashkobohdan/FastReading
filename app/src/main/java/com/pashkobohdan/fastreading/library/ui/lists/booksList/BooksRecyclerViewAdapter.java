@@ -19,6 +19,7 @@ import java.util.List;
  */
 
 public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolder> {
+    public static final String PERCENT_SYMBOL = " %";
 
     private Activity activity;
 
@@ -117,10 +118,10 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
         viewHolder.getBookAuthor().setText(item.getAuthor());
 
         if (item.isWasRead()) {
-            viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWords().length);
+            viewHolder.getBookCurrentAndTotalWords().setText((int) (100.0 * item.getCurrentWordNumber() / item.getWords().length) + PERCENT_SYMBOL);
         } else {
             item.readWords(() -> activity.runOnUiThread(() ->
-                            viewHolder.getBookCurrentAndTotalWords().setText(item.getCurrentWordNumber() + " / " + item.getWords().length)),
+                            viewHolder.getBookCurrentAndTotalWords().setText((int) (100.0 * item.getCurrentWordNumber() / item.getWords().length) + PERCENT_SYMBOL)),
                     () -> activity.runOnUiThread(() ->
                             viewHolder.getBookCurrentAndTotalWords().setText(R.string.book_list_book_reading_error)));
         }
