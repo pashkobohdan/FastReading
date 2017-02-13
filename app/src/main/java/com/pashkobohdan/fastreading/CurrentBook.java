@@ -58,8 +58,8 @@ public class CurrentBook extends AppCompatActivity {
     private TextView currentBookProgress;
     private TextView currentWordLeftPart, currentWordCenterPart, currentWordRightPart, currentSpeed;
     private ImageButton positionForwardBack, positionBack, positionUp, positionForwardUp;
-
     private TextView topBoundaryLine, bottomBoundaryLine;
+    private TextView newSpeedOnPlaying;
 
     private volatile ReadingStatus currentReadingStatus;
     private ArrayList<Word> words;
@@ -98,6 +98,9 @@ public class CurrentBook extends AppCompatActivity {
 
         topBoundaryLine = (TextView) findViewById(R.id.current_book_top_boundary_line);
         bottomBoundaryLine = (TextView) findViewById(R.id.current_book_bottom_boundary_line);
+
+        newSpeedOnPlaying = (TextView) findViewById(R.id.current_book_online_new_speed);
+        newSpeedOnPlaying.setVisibility(View.GONE);
 
         // set actionBar
         setSupportActionBar((Toolbar) findViewById(R.id.current_book_toolbar));
@@ -224,8 +227,8 @@ public class CurrentBook extends AppCompatActivity {
                 isUserRewind = true;
                 break;
 
-            case R.id.action_cancel_last_rewind :
-                if(isUserRewind) {
+            case R.id.action_cancel_last_rewind:
+                if (isUserRewind) {
                     setReadingPosition(lastPositionBeforeRewind);
                 }
                 break;
@@ -235,6 +238,9 @@ public class CurrentBook extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    boolean speedChangingWhenReading = false;
+    long lastUserChangingReading = 0;
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -242,6 +248,22 @@ public class CurrentBook extends AppCompatActivity {
                 bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() > SPEED_MIN_VALUE ?
                         bookInfo.getCurrentSpeed() - SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
                 currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
+
+                if (currentReadingStatus == ReadingStatus.STATUS_PLAYING) {
+                    speedChangingWhenReading = true;
+                    lastUserChangingReading = System.nanoTime();
+
+                    newSpeedOnPlaying.setVisibility(View.VISIBLE);
+                    newSpeedOnPlaying.setText("Speed : " + bookInfo.getCurrentSpeed());
+                    new Handler().postDelayed(() -> {
+                        if (System.nanoTime() - lastUserChangingReading > 1000 * 1000 * 1000) {
+                            newSpeedOnPlaying.setVisibility(View.GONE);
+                            speedChangingWhenReading = false;
+                        }
+
+                    }, 1000);
+                }
+
                 startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
 
                 return true;
@@ -250,6 +272,22 @@ public class CurrentBook extends AppCompatActivity {
                 bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() < SPEED_MAX_VALUE ?
                         bookInfo.getCurrentSpeed() + SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
                 currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
+
+                if (currentReadingStatus == ReadingStatus.STATUS_PLAYING) {
+                    speedChangingWhenReading = true;
+                    lastUserChangingReading = System.nanoTime();
+
+                    newSpeedOnPlaying.setVisibility(View.VISIBLE);
+                    newSpeedOnPlaying.setText("Speed : " + bookInfo.getCurrentSpeed());
+                    new Handler().postDelayed(() -> {
+                        if (System.nanoTime() - lastUserChangingReading > 1000 * 1000 * 1000) {
+                            newSpeedOnPlaying.setVisibility(View.GONE);
+                            speedChangingWhenReading = false;
+                        }
+
+                    }, 1000);
+                }
+
                 startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
                 return true;
 
@@ -266,7 +304,7 @@ public class CurrentBook extends AppCompatActivity {
 
 
     /**
-     *  Business logic
+     * Business logic
      */
 
     private boolean getBookInfo() {
@@ -358,7 +396,7 @@ public class CurrentBook extends AppCompatActivity {
                     setReadingPosition(progress);
 
                     isUserRewind = true;
-                }else{
+                } else {
                     isUserRewind = false;
                 }
             }
