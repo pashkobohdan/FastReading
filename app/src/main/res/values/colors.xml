@@ -17,4 +17,5 @@
 
     <color name="word_color_default">#000000</color>
     <color name="center_letter_color_default">#ff0000</color>
+    <color name="boundary_lines_color_default">#000000</color>
 </resources>

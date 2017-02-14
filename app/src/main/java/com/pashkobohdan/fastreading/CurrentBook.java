@@ -3,15 +3,19 @@ package com.pashkobohdan.fastreading;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -30,6 +34,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.os.Handler;
+import android.widget.Toast;
 
 
 import static android.view.KeyEvent.KEYCODE_BACK;
@@ -43,6 +48,8 @@ public class CurrentBook extends AppCompatActivity {
     public static final int SPEED_MIN_VALUE = 20;
     public static final int SPEED_MAX_VALUE = 1500;
     public static final int REWIND_WORD_DELAY = 100;
+    public static final int NANOSECONDS_IN_ONE_SECOND = 1000 * 1000 * 1000;
+    public static final double MILLISECONDS_IN_ONE_MINUTE = 60000.0;
 
     enum ReadingStatus {
         STATUS_PLAYING,
@@ -72,6 +79,10 @@ public class CurrentBook extends AppCompatActivity {
 
     private boolean isUserRewind = false;
     private int lastPositionBeforeRewind = 0;
+
+    private boolean hideStatusBarForReading;
+
+    private View mDecorView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +116,10 @@ public class CurrentBook extends AppCompatActivity {
         // set actionBar
         setSupportActionBar((Toolbar) findViewById(R.id.current_book_toolbar));
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        mDecorView = getWindow().getDecorView();
+
         // check bookInfo for cracks
         if (!getBookInfo()) {
             new AlertDialog.Builder(this)
@@ -122,7 +137,7 @@ public class CurrentBook extends AppCompatActivity {
 
 
         /**
-         *  Here's all right !
+         *  Here's all right ! (if we're here)
          */
 
         //refresh book's last opening date (time)
@@ -155,6 +170,25 @@ public class CurrentBook extends AppCompatActivity {
         int wordColor = preferences.getInt("word_color", getResources().getColor(R.color.word_color_default));
         int centerLetterColor = preferences.getInt("center_letter_color", getResources().getColor(R.color.center_letter_color_default));
         int textSize = Integer.parseInt(preferences.getString("text_size", "20"));
+        int boundaryLinesColor = preferences.getInt("boundary_lines_color", R.color.boundary_lines_color_default);
+        boolean isNightMode = preferences.getBoolean("night_mode", false);
+
+        hideStatusBarForReading = preferences.getBoolean("hide_status_bar", false);
+        //getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+
+        if (isNightMode) {
+            currentBookProgress.setTextColor(Color.WHITE);
+            newSpeedOnPlaying.setTextColor(Color.WHITE);
+
+            topManagePanel.setBackgroundColor(Color.BLACK);
+            readingPanel.setBackgroundColor(Color.BLACK);
+        } else {
+            currentBookProgress.setTextColor(Color.BLACK);
+            newSpeedOnPlaying.setTextColor(Color.BLACK);
+
+            topManagePanel.setBackgroundColor(Color.WHITE);
+            readingPanel.setBackgroundColor(Color.WHITE);
+        }
 
         if (showBoundaryLines) {
             topBoundaryLine.setVisibility(View.VISIBLE);
@@ -163,6 +197,9 @@ public class CurrentBook extends AppCompatActivity {
             topBoundaryLine.setVisibility(View.GONE);
             bottomBoundaryLine.setVisibility(View.GONE);
         }
+
+        topBoundaryLine.setBackgroundColor(boundaryLinesColor);
+        bottomBoundaryLine.setBackgroundColor(boundaryLinesColor);
 
         currentWordLeftPart.setTextColor(wordColor);
         currentWordRightPart.setTextColor(wordColor);
@@ -256,15 +293,15 @@ public class CurrentBook extends AppCompatActivity {
                     newSpeedOnPlaying.setVisibility(View.VISIBLE);
                     newSpeedOnPlaying.setText("Speed : " + bookInfo.getCurrentSpeed());
                     new Handler().postDelayed(() -> {
-                        if (System.nanoTime() - lastUserChangingReading > 1000 * 1000 * 1000) {
+                        if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
                             newSpeedOnPlaying.setVisibility(View.GONE);
                             speedChangingWhenReading = false;
                         }
 
                     }, 1000);
-                }
 
-                startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
+                    startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
+                }
 
                 return true;
 
@@ -280,17 +317,17 @@ public class CurrentBook extends AppCompatActivity {
                     newSpeedOnPlaying.setVisibility(View.VISIBLE);
                     newSpeedOnPlaying.setText("Speed : " + bookInfo.getCurrentSpeed());
                     new Handler().postDelayed(() -> {
-                        if (System.nanoTime() - lastUserChangingReading > 1000 * 1000 * 1000) {
+                        if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
                             newSpeedOnPlaying.setVisibility(View.GONE);
                             speedChangingWhenReading = false;
                         }
 
                     }, 1000);
+
+                    startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
                 }
 
-                startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
                 return true;
-
 
             case KEYCODE_BACK:
                 //tryExitToBookList();
@@ -346,8 +383,20 @@ public class CurrentBook extends AppCompatActivity {
     }
 
     private void initializeListeners() {
+        mDecorView.setOnSystemUiVisibilityChangeListener(flags -> {
+            boolean fullscreen = (flags & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
+            if (!fullscreen) {
+                showSystemUI();
+                refreshStatus(ReadingStatus.STATUS_PAUSE);
+            }
+        });
+
+
         readingPanel.setOnClickListener(v -> {
             if (currentReadingStatus == ReadingStatus.STATUS_PAUSE) {
+                if (hideStatusBarForReading) {
+                    hideSystemUI();
+                }
                 refreshStatus(ReadingStatus.STATUS_PLAYING);
             } else {
                 refreshStatus(ReadingStatus.STATUS_PAUSE);
@@ -435,7 +484,7 @@ public class CurrentBook extends AppCompatActivity {
                         refreshStatus(ReadingStatus.STATUS_PAUSE);
                     } else {
                         if (words.get(getReadingPosition()).toString().length() > 10) {
-                            startOfRestartPlaying((int) (6000.0 * TIME_DELTA_LONG_WORDS / bookInfo.getCurrentSpeed()));
+                            startOfRestartPlaying((int) (MILLISECONDS_IN_ONE_MINUTE * TIME_DELTA_LONG_WORDS / bookInfo.getCurrentSpeed()));
                         }
                     }
 
@@ -457,6 +506,8 @@ public class CurrentBook extends AppCompatActivity {
                 topManagePanel.setVisibility(View.VISIBLE);
                 bottomManagePanel.setVisibility(View.VISIBLE);
 
+                newSpeedOnPlaying.setVisibility(View.VISIBLE);
+
                 stopPlaying();
                 break;
             case STATUS_PLAYING:
@@ -465,10 +516,22 @@ public class CurrentBook extends AppCompatActivity {
                 topManagePanel.setVisibility(View.GONE);
                 bottomManagePanel.setVisibility(View.GONE);
 
+                newSpeedOnPlaying.setVisibility(View.GONE);
+
                 startOfRestartPlaying(1000);
                 break;
         }
     }
+
+
+    private void hideSystemUI() {
+        mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    private void showSystemUI() {
+        mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+    }
+
 
     private void startOfRestartPlaying(int initialDelay) {
         stopPlaying();
@@ -476,8 +539,8 @@ public class CurrentBook extends AppCompatActivity {
         timer = new Timer();
 
         timer.schedule(timerTask, initialDelay == -1 ?
-                        (int) (60000.0 / bookInfo.getCurrentSpeed()) : initialDelay,
-                (int) (60000.0 / bookInfo.getCurrentSpeed()));
+                        (int) (MILLISECONDS_IN_ONE_MINUTE / bookInfo.getCurrentSpeed()) : initialDelay,
+                (int) (MILLISECONDS_IN_ONE_MINUTE / bookInfo.getCurrentSpeed()));
     }
 
     private void stopPlaying() {
