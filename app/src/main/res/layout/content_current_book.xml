@@ -110,6 +110,7 @@
 
 
             <TextView
+                android:visibility="gone"
                 android:gravity="center"
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"

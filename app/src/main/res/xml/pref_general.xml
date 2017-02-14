@@ -3,17 +3,20 @@
 
     <PreferenceCategory android:title="Skin">
 
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="night_mode"
-            android:summary="For reading in the evening.\nDon't forget change word color."
-            android:title="Night mode" />
 
         <SwitchPreference
             android:defaultValue="false"
             android:key="hide_status_bar"
-            android:summary="Clear reading place.\nBut you'll need click twice to stop reading (first to show status bar and second to pause)"
-            android:title="Hide status bar" />
+            android:summary="Clean reading place.\nBut you'll need click twice to stop reading (first to show status bar and second to pause)"
+            android:title="Hide status bar for reading" />
+
+        <com.jrummyapps.android.colorpicker.ColorPreference
+            android:defaultValue="@color/white"
+            android:key="background_color"
+            android:summary="Color of reading place (background)"
+            android:title="Background color"
+            app:colorShape="circle" />
+
 
     </PreferenceCategory>
 

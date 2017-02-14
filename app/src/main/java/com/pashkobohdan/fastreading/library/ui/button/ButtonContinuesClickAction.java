@@ -7,6 +7,9 @@ import android.view.View;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * Very helpful class.
+ * Continues click when you fire button (onClick word too)
+ *
  * Created by Bohdan Pashko on 12.02.17.
  */
 
@@ -48,14 +51,5 @@ public class ButtonContinuesClickAction {
             }
             return false;
         });
-
-//        button.setOnClickListener(v -> {
-//            if (!isLongClick.get()) {
-//                action.run();
-//            }
-//            isLongClick.set(false);
-//        });
     }
-
-
 }

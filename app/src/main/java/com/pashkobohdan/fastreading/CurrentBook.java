@@ -9,11 +9,9 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -34,7 +32,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.os.Handler;
-import android.widget.Toast;
 
 
 import static android.view.KeyEvent.KEYCODE_BACK;
@@ -84,12 +81,59 @@ public class CurrentBook extends AppCompatActivity {
 
     private View mDecorView;
 
+
+    boolean speedChangingWhenReading = false;
+    long lastUserChangingReading = 0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_current_book);
 
-        // ui elements setting
+        findUiElements();
+
+        setSupportActionBar((Toolbar) findViewById(R.id.current_book_toolbar));
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        mDecorView = getWindow().getDecorView();
+
+        // check bookInfo for cracks
+        if (!getBookInfo()) {
+            new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setMessage("Book loading error. Try later")
+                    .setPositiveButton("Ok", (dialog, which) -> finish())
+                    .show();
+
+            return;
+        }
+
+        // actionBar changing
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(bookInfo.getName());
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+
+        /**
+         *  Here's all right ! (if we're here)
+         */
+
+        bookInfo.setLastOpeningDate((int) (new Date().getTime() / 1000));
+
+        parseWords();
+
+        initializeStartReadingValues();
+
+        initializeListeners();
+
+        /**
+         *  start reading (pause mode)
+         */
+        refreshStatus(ReadingStatus.STATUS_PAUSE);
+    }
+
+    private void findUiElements() {
         appBarLayout = (AppBarLayout) findViewById(R.id.current_book_app_bar_layout);
 
         topManagePanel = (LinearLayout) findViewById(R.id.current_book_top_manage_panel);
@@ -112,47 +156,6 @@ public class CurrentBook extends AppCompatActivity {
 
         newSpeedOnPlaying = (TextView) findViewById(R.id.current_book_online_new_speed);
         newSpeedOnPlaying.setVisibility(View.GONE);
-
-        // set actionBar
-        setSupportActionBar((Toolbar) findViewById(R.id.current_book_toolbar));
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        mDecorView = getWindow().getDecorView();
-
-        // check bookInfo for cracks
-        if (!getBookInfo()) {
-            new AlertDialog.Builder(this)
-                    .setCancelable(false)
-                    .setMessage("Book loading error. Try later")
-                    .setPositiveButton("Ok", (dialog, which) -> finish())
-                    .show();
-        }
-
-        // actionBar changing
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(bookInfo.getName());
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-
-
-        /**
-         *  Here's all right ! (if we're here)
-         */
-
-        //refresh book's last opening date (time)
-        bookInfo.setLastOpeningDate((int) (new Date().getTime() / 1000));
-
-        parseWords();
-
-        initializeStartReadingVaules();
-
-        initializeListeners();
-
-        /**
-         *  current status - PAUSE
-         */
-        refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
 
     @Override
@@ -171,23 +174,19 @@ public class CurrentBook extends AppCompatActivity {
         int centerLetterColor = preferences.getInt("center_letter_color", getResources().getColor(R.color.center_letter_color_default));
         int textSize = Integer.parseInt(preferences.getString("text_size", "20"));
         int boundaryLinesColor = preferences.getInt("boundary_lines_color", R.color.boundary_lines_color_default);
-        boolean isNightMode = preferences.getBoolean("night_mode", false);
+        int backgroundColor = preferences.getInt("background_color", getResources().getColor(R.color.white));
 
         hideStatusBarForReading = preferences.getBoolean("hide_status_bar", false);
         //getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
 
-        if (isNightMode) {
+        topManagePanel.setBackgroundColor(backgroundColor);
+        readingPanel.setBackgroundColor(backgroundColor);
+        if (isColorDark(backgroundColor)) {
             currentBookProgress.setTextColor(Color.WHITE);
             newSpeedOnPlaying.setTextColor(Color.WHITE);
-
-            topManagePanel.setBackgroundColor(Color.BLACK);
-            readingPanel.setBackgroundColor(Color.BLACK);
         } else {
             currentBookProgress.setTextColor(Color.BLACK);
             newSpeedOnPlaying.setTextColor(Color.BLACK);
-
-            topManagePanel.setBackgroundColor(Color.WHITE);
-            readingPanel.setBackgroundColor(Color.WHITE);
         }
 
         if (showBoundaryLines) {
@@ -227,6 +226,7 @@ public class CurrentBook extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
+        bookInfo.setCurrentWordNumber(readingPosition);
         refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
 
@@ -234,12 +234,12 @@ public class CurrentBook extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        bookInfo.setCurrentWordNumber(readingPosition);
         refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_current_book, menu);
         return true;
     }
@@ -274,9 +274,6 @@ public class CurrentBook extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    boolean speedChangingWhenReading = false;
-    long lastUserChangingReading = 0;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -352,29 +349,24 @@ public class CurrentBook extends AppCompatActivity {
         return bookInfo != null;
     }
 
+
+
+    public boolean isColorDark(int color) {
+        double darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
+        return darkness >= 0.5;
+    }
+
     private void parseWords() {
         words = new ArrayList<>();
 
         for (String word : bookInfo.getWords()) {
-            words.add(parseWordByString(word));
+            words.add(Word.newInstance(word));
         }
     }
 
-    private Word parseWordByString(String word) {
-        if (word.length() == 0) {
-            return new Word("", "", "");
-        } else if (word.length() == 1) {
-            return new Word("", word, "");
-        } else if (word.length() > 1 && word.length() < 6) {
-            return new Word(word.substring(0, 1), word.substring(1, 2), word.length() > 2 ? word.substring(2) : "");
-        } else if (word.length() > 5 && word.length() < 10) {
-            return new Word(word.substring(0, 2), word.substring(2, 3), word.substring(3));
-        } else {
-            return new Word(word.substring(0, 3), word.substring(3, 4), word.substring(4));
-        }
-    }
 
-    private void initializeStartReadingVaules() {
+
+    private void initializeStartReadingValues() {
         currentPositionSeekBar.setMax(words.size() - 1);
 
         setReadingPosition(bookInfo.getCurrentWordNumber());
@@ -476,8 +468,6 @@ public class CurrentBook extends AppCompatActivity {
                         setReadingPosition(getReadingPosition() + 1);
                     } else {
                         showBookEndDialog();
-                        // book is already end !
-                        // restart book (dialog) !
                     }
 
                     if (getReadingPosition() == words.size() - 1) {
@@ -501,27 +491,22 @@ public class CurrentBook extends AppCompatActivity {
 
         switch (currentReadingStatus) {
             case STATUS_PAUSE:
-
                 appBarLayout.setVisibility(View.VISIBLE);
                 topManagePanel.setVisibility(View.VISIBLE);
                 bottomManagePanel.setVisibility(View.VISIBLE);
 
-                newSpeedOnPlaying.setVisibility(View.VISIBLE);
-
                 stopPlaying();
                 break;
             case STATUS_PLAYING:
-
                 appBarLayout.setVisibility(View.GONE);
                 topManagePanel.setVisibility(View.GONE);
                 bottomManagePanel.setVisibility(View.GONE);
-
-                newSpeedOnPlaying.setVisibility(View.GONE);
 
                 startOfRestartPlaying(1000);
                 break;
         }
     }
+
 
 
     private void hideSystemUI() {
@@ -531,6 +516,7 @@ public class CurrentBook extends AppCompatActivity {
     private void showSystemUI() {
         mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
     }
+
 
 
     private void startOfRestartPlaying(int initialDelay) {
@@ -561,14 +547,6 @@ public class CurrentBook extends AppCompatActivity {
     }
 
 
-//    private void tryExitToBookList() {
-//        new AlertDialog.Builder(this)
-//                .setMessage("Do you want to go back ?")
-//                .setPositiveButton("Yes", (dialog, which) -> finish())
-//                .setNegativeButton("No", (dialog, which) -> {
-//                })
-//                .show();
-//    }
 
     public int getReadingPosition() {
         return readingPosition;
