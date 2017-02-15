@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "177287746269",
+    "firebase_url": "https://fast-reading-ef6e2.firebaseio.com",
+    "project_id": "fast-reading-ef6e2",
+    "storage_bucket": "fast-reading-ef6e2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177287746269:android:d8190de00a35b474",
+        "android_client_info": {
+          "package_name": "com.pashkobohdan.fastreading"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "177287746269-oci7j9tnltlkk062h5jg9kjebevhvcv5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pashkobohdan.fastreading",
+            "certificate_hash": "ED0C553AEBA94A651F0647AE5408B388CE8B864E"
+          }
+        },
+        {
+          "client_id": "177287746269-eb2aak65rvci6an4vpnl1i61oasn9pj4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCR7G4qnlHJ-tf3OTb8UJdcY76MAxKC2ok"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "177287746269-eb2aak65rvci6an4vpnl1i61oasn9pj4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

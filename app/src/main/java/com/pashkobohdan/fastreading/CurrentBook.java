@@ -39,6 +39,7 @@ import static android.view.KeyEvent.KEYCODE_VOLUME_DOWN;
 import static android.view.KeyEvent.KEYCODE_VOLUME_UP;
 
 public class CurrentBook extends AppCompatActivity {
+    public static final String BOOK_INFO_EXTRA_NAME = "serializable_book_file";
     public static final double TIME_DELTA_LONG_WORDS = 1.5;
     public static final int RESTART_TIMER_TASK_ONLINE = -1;
     public static final int SPEED_CHANGE_STEP = 20;
@@ -48,39 +49,52 @@ public class CurrentBook extends AppCompatActivity {
     public static final int NANOSECONDS_IN_ONE_SECOND = 1000 * 1000 * 1000;
     public static final double MILLISECONDS_IN_ONE_MINUTE = 60000.0;
 
+    /**
+     * Main object (activity works with it)
+     */
+    private BookInfo bookInfo;
+
+    /**
+     * UI elements (layouts and views)
+     */
+    private AppBarLayout appBarLayout;
+    private LinearLayout topManagePanel, bottomManagePanel;
+    private SeekBar currentPositionSeekBar;
+    private TextView currentBookProgress;
+
+    private RelativeLayout readingPanel;
+    private TextView topBoundaryLine, bottomBoundaryLine;
+    private TextView currentWordLeftPart, currentWordCenterPart, currentWordRightPart, currentSpeed;
+    private TextView newSpeedOnPlaying;
+
+    private ImageButton positionForwardBack, positionBack, positionUp, positionForwardUp;
+
+    /**
+     * Reading help objects
+     */
     enum ReadingStatus {
         STATUS_PLAYING,
         STATUS_PAUSE
     }
-
-    private BookInfo bookInfo;
-
-    private AppBarLayout appBarLayout;
-    private LinearLayout topManagePanel, bottomManagePanel;
-    private RelativeLayout readingPanel;
-    private SeekBar currentPositionSeekBar;
-    private TextView currentBookProgress;
-    private TextView currentWordLeftPart, currentWordCenterPart, currentWordRightPart, currentSpeed;
-    private ImageButton positionForwardBack, positionBack, positionUp, positionForwardUp;
-    private TextView topBoundaryLine, bottomBoundaryLine;
-    private TextView newSpeedOnPlaying;
-
     private volatile ReadingStatus currentReadingStatus;
     private ArrayList<Word> words;
     private int readingPosition;
 
-
+    /**
+     * Text showing schedulers
+     */
     private Timer timer;
     private TimerTask timerTask;
     private Handler handler = new Handler();
 
+    /**
+     * Good features
+     */
     private boolean isUserRewind = false;
     private int lastPositionBeforeRewind = 0;
 
-    private boolean hideStatusBarForReading;
-
     private View mDecorView;
-
+    private boolean hideStatusBarForReading;
 
     boolean speedChangingWhenReading = false;
     long lastUserChangingReading = 0;
@@ -246,10 +260,8 @@ public class CurrentBook extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
-                //tryExitToBookList();
                 finish();
                 break;
 
@@ -269,7 +281,6 @@ public class CurrentBook extends AppCompatActivity {
                     setReadingPosition(lastPositionBeforeRewind);
                 }
                 break;
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -343,7 +354,7 @@ public class CurrentBook extends AppCompatActivity {
 
     private boolean getBookInfo() {
         Intent i = getIntent();
-        File bookFile = (File) i.getSerializableExtra("serializable_book_file");
+        File bookFile = (File) i.getSerializableExtra(BOOK_INFO_EXTRA_NAME);
 
         bookInfo = BookInfosList.get(bookFile);
         return bookInfo != null;

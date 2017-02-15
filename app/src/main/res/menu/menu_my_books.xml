@@ -6,8 +6,8 @@
     <group android:checkableBehavior="single">
 
         <item
-            android:checked="true"
             android:id="@+id/action_sort_by_last_open"
+            android:checked="true"
             android:orderInCategory="100"
             android:title="Sort by last opening"
             app:showAsAction="never" />
@@ -44,10 +44,24 @@
             app:showAsAction="never" />
 
     </group>
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/sign_in"
+        android:orderInCategory="100"
+        android:title="Sign in"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/sign_out"
+        android:orderInCategory="100"
+        android:title="Sign out"
         app:showAsAction="never" />
 
 </menu>

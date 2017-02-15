@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:counterEnabled="true"
-                app:counterMaxLength="150">
+                app:counterMaxLength="100">
 
                 <EditText
                     android:layout_width="match_parent"

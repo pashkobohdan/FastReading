@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,35 +18,51 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
 import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
-import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenThread;
 import com.pashkobohdan.fastreading.library.ui.dialogs.BookEditDialog;
 import com.pashkobohdan.fastreading.library.ui.lists.booksList.BooksRecyclerViewAdapter;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 
 import ir.sohreco.androidfilechooser.ExternalStorageNotAvailableException;
 import ir.sohreco.androidfilechooser.FileChooserDialog;
 
+import static com.pashkobohdan.fastreading.CurrentBook.BOOK_INFO_EXTRA_NAME;
 import static com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper.INTERNAL_FILE_EXTENSION;
 
-public class AllBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener {
-
+public class AllBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener, GoogleApiClient.OnConnectionFailedListener {
     private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final int RC_SIGN_IN = 9001;
 
+    /**
+     * UI elements
+     */
     private RecyclerView booksRecyclerView;
     private RecyclerView.Adapter booksAdapter;
 
@@ -54,7 +71,9 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             floatingActionButtonDownloadBook,
             floatingActionButtonCreateBook;
 
-
+    /**
+     * Sorting
+     */
     enum BooksSortTypes {
         BY_LAST_OPENING,
         BY_PROGRESS,
@@ -64,8 +83,12 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         BY_BACK_AUTHOR
     }
 
-    BooksSortTypes booksSortType = BooksSortTypes.BY_LAST_OPENING;
+    private BooksSortTypes booksSortType = BooksSortTypes.BY_LAST_OPENING;
 
+
+    private GoogleApiClient mGoogleApiClient;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirechatUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,14 +115,38 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
         initFABsListeners();
 
+
+
         // if data is already loaded
         if (BookInfosList.getAll().size() == 0) {
-            initBookInfoDatas();
+            initBookInfoData();
         }
 
         if (booksAdapter == null) {
             initBooksListAdapter();
         }
+
+
+        authozire();
+    }
+
+    private void authozire() {
+        mFirebaseAuth = FirebaseAuth.getInstance();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "Google Play Services error", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -132,6 +179,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        BookInfosList.getAll().clear();
     }
 
 
@@ -142,6 +191,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
 
     private boolean mShareEmail = false;
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -165,7 +215,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         switch (item.getItemId()) {
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
-                return true;
+                break;
 
             case R.id.action_sort_by_last_open:
                 if (!item.isChecked()) {
@@ -173,8 +223,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     refreshBookList();
                     item.setChecked(true);
                 }
-
-                return true;
+                break;
 
             case R.id.action_sort_by_progress:
                 if (!item.isChecked()) {
@@ -182,9 +231,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     refreshBookList();
                     item.setChecked(true);
                 }
-
-                return true;
-
+                break;
 
             case R.id.action_sort_by_name:
                 if (!item.isChecked()) {
@@ -192,8 +239,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     refreshBookList();
                     item.setChecked(true);
                 }
-
-                return true;
+                break;
 
             case R.id.action_back_sort_by_name:
                 if (!item.isChecked()) {
@@ -201,8 +247,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     refreshBookList();
                     item.setChecked(true);
                 }
-
-                return true;
+                break;
 
             case R.id.action_sort_by_author:
                 if (!item.isChecked()) {
@@ -210,8 +255,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     refreshBookList();
                     item.setChecked(true);
                 }
-
-                return true;
+                break;
 
             case R.id.action_back_sort_by_author:
                 if (!item.isChecked()) {
@@ -219,17 +263,74 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     refreshBookList();
                     item.setChecked(true);
                 }
+                break;
 
-                return true;
+            case R.id.sign_in:
+                signIn();
+                break;
+
+            case R.id.sign_out:
+                signOut();
+                break;
         }
-
 
         return super.onOptionsItemSelected(item);
     }
 
 
-    // business logic functions
+    private Runnable signInSuccess = null;
+    private void signIn() {
+        if (mFirebaseAuth.getCurrentUser() != null) {
+            Toast.makeText(this, "You're already authorized", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        Intent authorizeIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(authorizeIntent, RC_SIGN_IN);
+    }
+    private void signOut() {
+        mFirebaseAuth.signOut();
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+
+        Toast.makeText(this, "Sign out successfully !", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                GoogleSignInAccount account = result.getSignInAccount();
+                firebaseAuthWithGoogle(account);
+            } else {
+                Toast.makeText(AllBooks.this, "Google Sign In failed", Toast.LENGTH_SHORT).show();
+                signInSuccess = null;
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mFirebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(AllBooks.this, "Authentication failed. Try later", Toast.LENGTH_SHORT).show();
+                        signInSuccess = null;
+                    } else {
+                        Toast.makeText(AllBooks.this, "Sign in successfully !", Toast.LENGTH_SHORT).show();
+                        if (signInSuccess != null) {
+                            signInSuccess.run();
+                        }
+                    }
+                });
+    }
+
+
+    /**
+     * Business logic
+     */
     private void refreshBookList() {
         switch (booksSortType) {
             case BY_LAST_OPENING:
@@ -283,7 +384,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             booksFloatingActionsMenu.collapse();
         });
         floatingActionButtonDownloadBook.setOnClickListener(v -> {
-
+            tryDownloadBookFromCloud();
             booksFloatingActionsMenu.collapse();
         });
         floatingActionButtonCreateBook.setOnClickListener(v -> {
@@ -292,7 +393,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         });
     }
 
-    private void initBookInfoDatas() {
+    private void initBookInfoData() {
         for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
             BookInfosList.add(BookInfoFactory.newInstance(file, this));
         }
@@ -339,7 +440,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             }
 
             Intent i = new Intent(this, CurrentBook.class);
-            i.putExtra("serializable_book_file", bookInfo.getFile());
+            i.putExtra(BOOK_INFO_EXTRA_NAME, bookInfo.getFile());
             startActivity(i);
 
         }, (bookInfo) -> {
@@ -394,13 +495,6 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, this)
                         .setTitle("Select a file:")
                         .setFileFormats(new String[]{".txt", ".pdf", ".fb2"});
-        //.setSelectDirectoryButtonText("ENTEKHAB")
-        //.setSelectDirectoryButtonBackground(R.drawable.dr)
-        //.setSelectDirectoryButtonTextColor(R.color.cl)
-        //.setSelectDirectoryButtonTextSize(25)
-        //.setFileIcon(R.drawable.ic_file)
-        //.setDirectoryIcon(R.drawable.ic_directory)
-        //.setPreviousDirectoryButtonIcon(R.drawable.ic_prev_dir);
         try {
             builder.build().show(getSupportFragmentManager(), null);
         } catch (ExternalStorageNotAvailableException e) {
@@ -427,7 +521,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Do you want to rewrite this book \"" +
                     bookName +
-                    "\" ?\nAll reading progress will be removed)")
+                    "\" ?")
                     .setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener)
                     .show();
@@ -479,4 +573,18 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
         booksAdapter.notifyItemInserted(BookInfosList.getAll().size() - 1);
     }
+
+
+    private void tryDownloadBookFromCloud() {
+        if (mFirebaseAuth.getCurrentUser() != null) {
+            startActivity(new Intent(this, Download.class));
+        } else {
+            signInSuccess = () -> {
+                startActivity(new Intent(AllBooks.this, Download.class));
+                signInSuccess = null;
+            };
+            signIn();
+        }
+    }
+
 }

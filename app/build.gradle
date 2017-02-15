@@ -34,14 +34,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    //open PDF files
-
-    // file choosing
-
-    // swipe layout (uses recycler view)
-
-    // 'multi' fab
-
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.android.support:design:25.1.1'
 
@@ -55,4 +47,10 @@ dependencies {
 
     compile 'com.jrummyapps:colorpicker:2.0.5'
 
+    compile 'com.google.firebase:firebase-database:9.0.0'
+    compile 'com.google.firebase:firebase-auth:9.0.0'
+    compile 'com.google.android.gms:play-services-auth:9.0.0'
+
 }
+
+apply plugin: 'com.google.gms.google-services'
