@@ -42,7 +42,9 @@ import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBo
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenThread;
 import com.pashkobohdan.fastreading.library.firebase.downloadBooks.FirebaseBook;
+import com.pashkobohdan.fastreading.library.ui.dialogs.BookAddDialog;
 import com.pashkobohdan.fastreading.library.ui.dialogs.BookEditDialog;
+import com.pashkobohdan.fastreading.library.ui.lists.booksList.BookEventListener;
 import com.pashkobohdan.fastreading.library.ui.lists.booksList.BooksRecyclerViewAdapter;
 
 import java.io.File;
@@ -391,7 +393,10 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             booksFloatingActionsMenu.collapse();
         });
         floatingActionButtonCreateBook.setOnClickListener(v -> {
-
+            new BookAddDialog(this, bookInfo -> {
+                BookInfosList.add(bookInfo);
+                refreshBookList();
+            }).show();
             booksFloatingActionsMenu.collapse();
         });
     }
@@ -411,14 +416,16 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 return;
             }
 
-            new BookEditDialog(this, bookInfo, () ->
-                    booksAdapter.notifyItemChanged(BookInfosList.getAll().indexOf(bookInfo))).show();
+            new BookEditDialog(this, bookInfo, this::refreshBookList).show();
 
         }, (bookInfo) -> {
 
             Toast.makeText(this, "sharing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
 
         }, (bookInfo) -> {
+            if (!checkBookReady(bookInfo)) {
+                return;
+            }
 
             FirebaseBook book = new FirebaseBook(bookInfo.getName(), bookInfo.getAuthor(), bookInfo.getAllText());
 
@@ -594,6 +601,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         }
 
         BookInfosList.add(newBookInfo);
+        refreshBookList();
 
         booksAdapter.notifyItemInserted(BookInfosList.getAll().size() - 1);
     }

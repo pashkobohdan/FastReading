@@ -42,4 +42,5 @@ public interface FileReadWrite {
      * @return one of file writing results (FileWriteResult enum)
      */
     FileWriteResult write (@NonNull File file, @NonNull String text, @NonNull PercentSender percentSender);
+
 }

@@ -17,7 +17,6 @@
         android:inputType="textPersonName" />
 
     <ListView
-        android:focusable="true"
         android:id="@+id/download_firebase_books_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

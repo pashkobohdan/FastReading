@@ -11,10 +11,13 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 /**
  * Basic reading and writing files.
@@ -28,7 +31,7 @@ public class FileReadingAndWriting implements FileReadWrite {
 
     @Override
     public String read(@NonNull File file, @NonNull PercentSender percentSender) {
-        if (!file.canRead() || !file.canRead() || file.length() < 1) {
+        if (!file.exists() || !file.canRead() || file.length() < 1) {
             return null;
         }
 
@@ -37,7 +40,7 @@ public class FileReadingAndWriting implements FileReadWrite {
         BufferedReader bufferedReader = null;
         try {
             FileReader fileReader = new FileReader(file);
-            bufferedReader = new BufferedReader(fileReader, (int) file.length() / 5);
+            bufferedReader = new BufferedReader(fileReader, READING_BUFFER_SIZE);
 
             String line;
             int oldPercent = 0, newPercent;
@@ -127,8 +130,10 @@ public class FileReadingAndWriting implements FileReadWrite {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.write(text);
 
-            percentSender.refreshPercents(0, 100);
             writer.close();
+
+
+            percentSender.refreshPercents(0, 100);
         } catch (IOException e) {
             e.printStackTrace();
 

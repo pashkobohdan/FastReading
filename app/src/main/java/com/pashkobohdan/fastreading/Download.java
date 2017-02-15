@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -55,6 +56,7 @@ public class Download extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.download_firebase_books_list);
         searchText = (EditText) findViewById(R.id.firebase_books_search_text);
+        searchText.clearFocus();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -114,12 +116,15 @@ public class Download extends AppCompatActivity {
             refreshBooksList();
         });
 
+        ProgressDialog booksLoadingProgressDialog = new ProgressDialog(this);
+        booksLoadingProgressDialog.setMessage("Loading books");
+        booksLoadingProgressDialog.show();
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("books");
         myRef.limitToFirst(1000).orderByChild("bookName").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 books = new LinkedList<>();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     FirebaseBook book = postSnapshot.getValue(FirebaseBook.class);
@@ -128,6 +133,7 @@ public class Download extends AppCompatActivity {
 
                         boolean isExist = false;
                         for (BookInfo bookInfo : BookInfosList.getAll()) {
+
                             if (book.getBookName().equals(bookInfo.getName())
                                     && book.getBookAuthor().equals(bookInfo.getAuthor())
                                     && book.getBookText().equals(bookInfo.getAllText())) {
@@ -144,11 +150,16 @@ public class Download extends AppCompatActivity {
                     }
                 }
 
+                if (booksLoadingProgressDialog.isShowing()) {
+                    booksLoadingProgressDialog.dismiss();
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(Download.this, "Database error. Try later", Toast.LENGTH_SHORT).show();
+                if (booksLoadingProgressDialog.isShowing()) {
+                    booksLoadingProgressDialog.show();
+                }
             }
         });
     }

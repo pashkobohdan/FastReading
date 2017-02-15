@@ -8,23 +8,20 @@ import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.pashkobohdan.fastreading.R;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
+import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
+import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
 import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
-import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
-
-import java.io.File;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
+import com.pashkobohdan.fastreading.library.ui.lists.booksList.BookEventListener;
 
 /**
- * Shows dialog when you want change ant book.
- * Catches exceptions.
- * <p>
- * Created by Bohdan Pashko on 03.02.17.
+ * Created by bohdan on 15.02.17.
  */
 
-public class BookEditDialog {
+public class BookAddDialog {
 
     private TextInputLayout bookName;
     private TextInputLayout bookAuthor;
@@ -32,11 +29,10 @@ public class BookEditDialog {
 
     private AlertDialog alertDialog;
 
-    private BookInfo bookInfo;
+    private BookEventListener successEdit;
 
-
-    public BookEditDialog(final Activity activity, BookInfo bookInfo, Runnable successEdit) {
-        this.bookInfo = bookInfo;
+    public BookAddDialog(final Activity activity, BookEventListener successEdit) {
+        this.successEdit = successEdit;
 
         LayoutInflater factory = LayoutInflater.from(activity);
         View textEntryView = factory.inflate(R.layout.dialog_edit_book, null);
@@ -45,14 +41,8 @@ public class BookEditDialog {
         bookAuthor = (TextInputLayout) textEntryView.findViewById(R.id.dialog_edit_book_books_author);
         bookText = (EditText) textEntryView.findViewById(R.id.dialog_edit_book_books_text);
 
-        bookName.getEditText().setText(bookInfo.getName());
-        bookAuthor.getEditText().setText(bookInfo.getAuthor());
-
-
-        bookText.setText(bookInfo.getAllText());
-
         AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-                //.setTitle("Book's editing")
+                //.setTitle("Book cre")
                 .setPositiveButton("Save", null)
                 .setNegativeButton("Cancel", null)
                 .setView(textEntryView);
@@ -62,9 +52,8 @@ public class BookEditDialog {
         alertDialog.setOnShowListener(dialog -> {
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
 
-                if (tryEditBook(activity, bookInfo)) {
+                if (tryEditBook(activity)) {
                     dialog.dismiss();
-                    successEdit.run();
                 }
             });
 
@@ -82,7 +71,7 @@ public class BookEditDialog {
                 .show();
     }
 
-    private boolean tryEditBook(Activity activity, BookInfo bookInfo) {
+    private boolean tryEditBook(Activity activity) {
         if (bookName.isErrorEnabled() || bookAuthor.isErrorEnabled()) {
             new AlertDialog.Builder(activity)
                     .setPositiveButton("Ok", (dialog, which) -> {
@@ -100,29 +89,33 @@ public class BookEditDialog {
             String author = bookAuthor.getEditText().getText().toString();
             String text = bookText.getText().toString();
 
-            if (!name.equals(bookInfo.getName()) && name.length() > 0) {
-                bookInfo.setName(name);
+
+            if (name.length() > 0 && author.length() > 0 && text.length() > 0) {
+                BookReadingResult bookReadingResult = new BookReadingResult(text, name, author);
+
+                BookInfo bookInfo = BookInfoFactory.createNewInstance(bookReadingResult, activity);
+                if(bookInfo != null){
+                    successEdit.run(bookInfo);
+                    return true;
+                }else{
+                    new AlertDialog.Builder(activity)
+                            .setPositiveButton("Ok", (dialog, which) -> {
+                            })
+                            .setTitle("Error")
+                            .setMessage("Book writing error")
+                            .create()
+                            .show();
+                }
+            }else{
+                new AlertDialog.Builder(activity)
+                        .setPositiveButton("Ok", (dialog, which) -> {
+                        })
+                        .setTitle("Information")
+                        .setMessage("Please, set the valid data")
+                        .create()
+                        .show();
             }
 
-            if (!author.equals(bookInfo.getAuthor()) && author.length() > 0) {
-                bookInfo.setAuthor(author);
-            }
-
-            if (!text.equals(bookInfo.getAllText()) && text.length() > 0) {
-                bookInfo.setAllText(text);
-                String[] words = text.
-                        trim().
-                        replaceAll("\\s+", " ").
-                        replaceAll("(\\.)+", "\\.").
-                        split(" ");
-
-                bookInfo.setWords(words);
-
-                // add progressDialog !!!
-
-                new FileReadingAndWriting().write(bookInfo.getFile(), text, (o, n) -> {
-                });
-            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -138,7 +131,7 @@ public class BookEditDialog {
             return false;
         }
 
-        return true; // nothing changed
+        return false; // nothing changed
     }
 
 
