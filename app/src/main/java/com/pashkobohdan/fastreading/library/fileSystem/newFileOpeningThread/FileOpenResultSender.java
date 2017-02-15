@@ -1,6 +1,7 @@
 package com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread;
 
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 
 
 /**
@@ -9,6 +10,6 @@ import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBo
 @FunctionalInterface
 public interface FileOpenResultSender {
 
-    void send(AnyBookOpeningResult file);
+    void send(BookReadingResult file);
 
 }

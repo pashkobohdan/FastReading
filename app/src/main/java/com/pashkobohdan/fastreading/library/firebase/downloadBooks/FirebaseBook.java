@@ -50,4 +50,27 @@ public class FirebaseBook {
                 ", bookText='" + bookText + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FirebaseBook book = (FirebaseBook) o;
+
+        if (bookName != null ? !bookName.equals(book.bookName) : book.bookName != null)
+            return false;
+        if (bookAuthor != null ? !bookAuthor.equals(book.bookAuthor) : book.bookAuthor != null)
+            return false;
+        return bookText != null ? bookText.equals(book.bookText) : book.bookText == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bookName != null ? bookName.hashCode() : 0;
+        result = 31 * result + (bookAuthor != null ? bookAuthor.hashCode() : 0);
+        result = 31 * result + (bookText != null ? bookText.hashCode() : 0);
+        return result;
+    }
 }

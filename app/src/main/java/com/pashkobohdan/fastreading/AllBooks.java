@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,8 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
@@ -31,19 +28,20 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
 import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
+import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenThread;
+import com.pashkobohdan.fastreading.library.firebase.downloadBooks.FirebaseBook;
 import com.pashkobohdan.fastreading.library.ui.dialogs.BookEditDialog;
 import com.pashkobohdan.fastreading.library.ui.lists.booksList.BooksRecyclerViewAdapter;
 
@@ -88,7 +86,9 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
-    private FirebaseUser mFirechatUser;
+
+    private FirebaseDatabase database;
+    private DatabaseReference booksReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,10 +127,14 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         }
 
 
-        authozire();
+        authorizeInitialize();
+
+
+        database = FirebaseDatabase.getInstance();
+        booksReference = database.getReference("books");
     }
 
-    private void authozire() {
+    private void authorizeInitialize() {
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -141,7 +145,6 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
     }
 
     @Override
@@ -412,9 +415,24 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     booksAdapter.notifyItemChanged(BookInfosList.getAll().indexOf(bookInfo))).show();
 
         }, (bookInfo) -> {
+
             Toast.makeText(this, "sharing : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+
         }, (bookInfo) -> {
-            Toast.makeText(this, "uploading : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+
+            FirebaseBook book = new FirebaseBook(bookInfo.getName(), bookInfo.getAuthor(), bookInfo.getAllText());
+
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Book uploading");
+            progressDialog.setMessage("You can hide this message, uploading will continue in background");
+            progressDialog.show();
+
+            booksReference.push().setValue(book, (databaseError, databaseReference) -> {
+                progressDialog.dismiss();
+                Toast.makeText(AllBooks.this, "Book upload successfully", Toast.LENGTH_SHORT).show();
+            });
+
+
         }, (bookInfo, ifConfirmed) -> {
             DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
                 switch (which) {
@@ -568,8 +586,14 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
     }
 
-    private void addNewBookToBooksList(AnyBookOpeningResult bookOpeningResult) {
-        BookInfosList.add(BookInfoFactory.createNewInstance(bookOpeningResult, this));
+    private void addNewBookToBooksList(BookReadingResult bookOpeningResult) {
+        BookInfo newBookInfo = BookInfoFactory.createNewInstance(bookOpeningResult, this);
+        if(newBookInfo == null){
+            Toast.makeText(this, "Book writing error", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        BookInfosList.add(newBookInfo);
 
         booksAdapter.notifyItemInserted(BookInfosList.getAll().size() - 1);
     }

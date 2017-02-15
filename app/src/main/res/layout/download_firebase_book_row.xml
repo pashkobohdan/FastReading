@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="4dp"
+    android:id="@+id/firebase_book_row_relative_layout">
 
     <TextView
-        android:layout_margin="2dp"
         android:textSize="20sp"
         android:ellipsize="end"
         android:text="Book name"
@@ -13,7 +14,7 @@
         android:id="@+id/firebase_book_name" />
 
     <TextView
-        android:layout_margin="2dp"
+        android:layout_marginTop="2dp"
         android:layout_below="@+id/firebase_book_name"
         android:ellipsize="end"
         android:text="Author"
@@ -22,7 +23,7 @@
         android:id="@+id/firebase_book_author" />
 
     <TextView
-        android:layout_margin="2dp"
+        android:layout_marginTop="2dp"
         android:maxLines="2"
         android:layout_below="@+id/firebase_book_author"
         android:ellipsize="end"

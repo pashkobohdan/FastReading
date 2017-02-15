@@ -4,12 +4,12 @@
     android:id="@+id/activity_download"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
+    android:padding="4dp"
     android:windowSoftInputMode="adjustResize"
     tools:context="com.pashkobohdan.fastreading.Download">
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/firebase_books_search_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -17,10 +17,11 @@
         android:inputType="textPersonName" />
 
     <ListView
+        android:focusable="true"
         android:id="@+id/download_firebase_books_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/editText" />
+        android:layout_below="@+id/firebase_books_search_text" />
 
 
 </RelativeLayout>

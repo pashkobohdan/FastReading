@@ -67,8 +67,13 @@ public class FirebaseBooksListAdapter extends ArrayAdapter<FirebaseBook> {
         FirebaseBookHolder viewHolder = new FirebaseBookHolder(view);
         viewHolder.bookName.setText(item.getBookName());
         viewHolder.bookAuthor.setText(item.getBookAuthor());
-        viewHolder.bookText.setText(item.getBookText());
+        viewHolder.bookText.setText(getSubstring(item.getBookText(), 500));
 
         return view;
+    }
+
+
+    private String getSubstring(String string, int maxLength) {
+        return string.length() > maxLength ? string.substring(0, maxLength - 1) : string;
     }
 }

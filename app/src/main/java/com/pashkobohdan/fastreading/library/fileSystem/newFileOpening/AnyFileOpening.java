@@ -54,7 +54,7 @@ public class AnyFileOpening {
      * @param file input file
      * @return text of input file (without excess white spaces)
      */
-    public static AnyBookOpeningResult open(@NonNull File file, final @NonNull Activity activity,
+    public static BookReadingResult open(@NonNull File file, final @NonNull Activity activity,
                                             @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender,
                                             @NonNull PercentSender writingPercentSender, @NonNull Runnable writingEndSender) {
         if (!file.canRead() || file.length() < 1) {
@@ -82,22 +82,24 @@ public class AnyFileOpening {
         // checking output text
         BookReadingResult bookOpeningResult = fileOpen.open(file, readingPercentSender, readingEndSender);
         if (bookOpeningResult == null || bookOpeningResult.getBookText().length() < 1) {
+            //return null;
             return null;
         }
+        return bookOpeningResult;
 
-        // creating output file (in internal path)
-        File outputFile = InternalStorageFileHelper.createNewFile(activity, file);
-        if (outputFile == null) {
-            return null;
-        }
-
-        // writing text to output file
-        FileWriteResult fileWriteResult = fileReadWrite.write(outputFile, bookOpeningResult.getBookText(), writingPercentSender);
-        if (fileWriteResult != FileWriteResult.SUCCESS) {
-            return null;
-        }
-        writingEndSender.run();
-
-        return new AnyBookOpeningResult(bookOpeningResult, outputFile);
+//        // creating output file (in internal path)
+//        File outputFile = InternalStorageFileHelper.createNewFile(activity, file);
+//        if (outputFile == null) {
+//            return null;
+//        }
+//
+//        // writing text to output file
+//        FileWriteResult fileWriteResult = fileReadWrite.write(outputFile, bookOpeningResult.getBookText(), writingPercentSender);
+//        if (fileWriteResult != FileWriteResult.SUCCESS) {
+//            return null;
+//        }
+//        writingEndSender.run();
+//
+//        return new AnyBookOpeningResult(bookOpeningResult, outputFile);
     }
 }
