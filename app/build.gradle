@@ -51,6 +51,8 @@ dependencies {
     compile 'com.google.firebase:firebase-auth:9.0.0'
     compile 'com.google.android.gms:play-services-auth:9.0.0'
 
+    compile 'com.morsebyte.shailesh.twostagerating:TwoStageRate:2.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

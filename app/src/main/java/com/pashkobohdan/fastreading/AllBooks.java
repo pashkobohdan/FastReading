@@ -35,9 +35,13 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.morsebyte.shailesh.twostagerating.FeedbackReceivedListener;
+import com.morsebyte.shailesh.twostagerating.FeedbackWithRatingReceivedListener;
+import com.morsebyte.shailesh.twostagerating.TwoStageRate;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
+import com.pashkobohdan.fastreading.library.feedback.EmailFeedback;
 import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
@@ -95,6 +99,10 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     private FirebaseDatabase database;
     private DatabaseReference booksReference;
 
+
+    private TwoStageRate twoStageRate;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +131,6 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         initFABsListeners();
 
 
-
         // if data is already loaded
         if (BookInfosList.getAll().size() == 0) {
             initBookInfoData();
@@ -134,6 +141,42 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         }
 
 
+        /**
+         * Init rate this app
+         */
+        twoStageRate = TwoStageRate.with(this);
+        twoStageRate.setInstallDays(3).setLaunchTimes(5).setEventsTimes(3);
+        twoStageRate.resetOnDismiss(true).resetOnFeedBackDeclined(true).resetOnRatingDeclined(false);
+
+        twoStageRate.setFeedbackReceivedListener(feedback -> Toast.makeText(AllBooks.this, feedback, Toast.LENGTH_SHORT).show());
+
+        twoStageRate.setRatePromptTitle(getString(R.string.rate_prompt_title)).
+                setRatePromptDismissible(false).
+                resetOnDismiss(true).
+                resetOnFeedBackDeclined(true).
+                resetOnRatingDeclined(true);
+
+        twoStageRate.setConfirmRateDialogTitle(getString(R.string.confirm_rate_title)).
+                setConfirmRateDialogDescription(getString(R.string.confirm_rate_description)).
+                setConfirmRateDialogPositiveText(getString(R.string.confirm_rate_positive)).
+                setConfirmRateDialogNegativeText(getString(R.string.confirm_rate_negative)).
+                setConfirmRateDialogDismissible(false);
+
+        twoStageRate.setFeedbackDialogTitle(getString(R.string.feedback_title)).
+                setFeedbackDialogDescription(getString(R.string.feedback_description)).
+                setFeedbackDialogPositiveText(getString(R.string.feedback_positive)).
+                setFeedbackDialogNegativeText(getString(R.string.feedback_negative)).
+                setFeedbackDialogDismissible(true);
+
+        twoStageRate.setFeedbackWithRatingReceivedListener((rating, feedback) -> {
+            if (!EmailFeedback.sendEmailToDeveloper(AllBooks.this, "Fast Reading. Feedback", "Rating : " + rating + "\n\n" + feedback)) {
+                Toast.makeText(AllBooks.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        /**
+         * Firebase and google init
+         */
         authorizeInitialize();
 
 
@@ -174,6 +217,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             openFileChooserDialog();
             mShareEmail = false;
         }
+
+        twoStageRate.incrementEvent();
     }
 
     @Override
@@ -219,7 +264,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
         signInSignOut = menu.findItem(R.id.sign_in_or_out);
 
-        if(signInSignOut != null) {
+        if (signInSignOut != null) {
             if (mFirebaseAuth.getCurrentUser() != null) {
                 signInSignOut.setTitle(R.string.sign_out);
             } else {
@@ -295,6 +340,10 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 //                startActivity(new Intent(this, Help.class));
 //                break;
 
+            case R.id.rate_app:
+                twoStageRate.showRatePromptDialog();
+                break;
+
 
         }
 
@@ -303,6 +352,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
 
     private Runnable signInSuccess = null;
+
     private void signInOrOut() {
         if (mFirebaseAuth.getCurrentUser() != null) {
             mFirebaseAuth.signOut();
@@ -310,14 +360,14 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
             Toast.makeText(this, "Sign out successfully !", Toast.LENGTH_SHORT).show();
 
-            if(signInSignOut != null) {
+            if (signInSignOut != null) {
                 if (mFirebaseAuth.getCurrentUser() != null) {
                     signInSignOut.setTitle(R.string.sign_out);
                 } else {
                     signInSignOut.setTitle(R.string.sign_in);
                 }
             }
-        }else{
+        } else {
             Intent authorizeIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
             startActivityForResult(authorizeIntent, RC_SIGN_IN);
         }
@@ -350,7 +400,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     } else {
                         Toast.makeText(AllBooks.this, "Sign in successfully !", Toast.LENGTH_SHORT).show();
 
-                        if(signInSignOut != null) {
+                        if (signInSignOut != null) {
                             if (mFirebaseAuth.getCurrentUser() != null) {
                                 signInSignOut.setTitle(R.string.sign_out);
                             } else {
@@ -628,7 +678,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
     private void addNewBookToBooksList(BookReadingResult bookOpeningResult) {
         BookInfo newBookInfo = BookInfoFactory.createNewInstance(bookOpeningResult, this);
-        if(newBookInfo == null){
+        if (newBookInfo == null) {
             Toast.makeText(this, "Book writing error", Toast.LENGTH_SHORT).show();
             return;
         }

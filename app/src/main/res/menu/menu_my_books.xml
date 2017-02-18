@@ -60,6 +60,14 @@
         app:showAsAction="ifRoom" />
 
 
+    <item
+        android:id="@+id/rate_app"
+        android:orderInCategory="100"
+        android:title="Rate this app"
+        app:showAsAction="ifRoom" />
+
+
+
     <!--<item-->
         <!--android:id="@+id/action_help"-->
         <!--android:orderInCategory="100"-->

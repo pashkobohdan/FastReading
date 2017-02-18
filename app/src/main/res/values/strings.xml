@@ -100,4 +100,13 @@
     <string name="default_book_author">no author</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
+    <string name="rate_prompt_title">How do you like our app ?</string>
+    <string name="confirm_rate_title">Thank you !</string>
+    <string name="confirm_rate_description">Would you like to post your review on app store. This will help and motivate us a lot</string>
+    <string name="confirm_rate_positive">Sure</string>
+    <string name="confirm_rate_negative">No Thanks</string>
+    <string name="feedback_title">We\'re Really Sorry</string>
+    <string name="feedback_description">Could you tell us what problem you faced? This will help us a lot</string>
+    <string name="feedback_positive">Submit</string>
+    <string name="feedback_negative">No Thanks</string>
 </resources>
