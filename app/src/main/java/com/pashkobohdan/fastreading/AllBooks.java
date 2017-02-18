@@ -35,6 +35,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.honu.aloha.WelcomeHelper;
 import com.morsebyte.shailesh.twostagerating.FeedbackReceivedListener;
 import com.morsebyte.shailesh.twostagerating.FeedbackWithRatingReceivedListener;
 import com.morsebyte.shailesh.twostagerating.TwoStageRate;
@@ -108,25 +109,34 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_books);
 
+        /**
+         * Welcome activity show (if run first time)
+         */
+        if (WelcomeHelper.isWelcomeRequired(this)) {
+            startActivity(new Intent(this, WelcomeActivity.class));
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
+
+        /**
+         * Toolbar setup
+         */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("My books");
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
+        /**
+         * UI elements setup
+         */
         booksFloatingActionsMenu = (FloatingActionsMenu) findViewById(R.id.book_list_fab_menu);
         floatingActionButtonOpenFile = (FloatingActionButton) findViewById(R.id.book_list_open_pdf_fb2_txt_file);
         floatingActionButtonDownloadBook = (FloatingActionButton) findViewById(R.id.book_list_download_book_from_cloud);
         floatingActionButtonCreateBook = (FloatingActionButton) findViewById(R.id.book_list_create_new_book);
 
-
         booksRecyclerView = (RecyclerView) findViewById(R.id.books_recycler_view);
         booksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-
-        signInSignOut = (MenuItem) findViewById(R.id.sign_in_or_out);
 
         initFABsListeners();
 
