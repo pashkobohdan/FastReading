@@ -25,11 +25,11 @@
             android:title="Sort by name"
             app:showAsAction="never" />
 
-        <item
-            android:id="@+id/action_back_sort_by_name"
-            android:orderInCategory="100"
-            android:title="Back sort by name"
-            app:showAsAction="never" />
+        <!--<item-->
+            <!--android:id="@+id/action_back_sort_by_name"-->
+            <!--android:orderInCategory="100"-->
+            <!--android:title="Back sort by name"-->
+            <!--app:showAsAction="never" />-->
 
         <item
             android:id="@+id/action_sort_by_author"
@@ -37,13 +37,21 @@
             android:title="Sort by author"
             app:showAsAction="never" />
 
-        <item
-            android:id="@+id/action_back_sort_by_author"
-            android:orderInCategory="100"
-            android:title="Back sort by author"
-            app:showAsAction="never" />
+        <!--<item-->
+            <!--android:id="@+id/action_back_sort_by_author"-->
+            <!--android:orderInCategory="100"-->
+            <!--android:title="Back sort by author"-->
+            <!--app:showAsAction="never" />-->
 
     </group>
+
+
+    <item
+        android:id="@+id/sign_in_or_out"
+        android:orderInCategory="100"
+        android:title="@string/sign_in"
+        app:showAsAction="never" />
+
 
     <item
         android:id="@+id/action_settings"
@@ -51,17 +59,12 @@
         android:title="@string/action_settings"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/sign_in"
-        android:orderInCategory="100"
-        android:title="Sign in"
-        app:showAsAction="never" />
 
+    <!--<item-->
+        <!--android:id="@+id/action_help"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="Help"-->
+        <!--app:showAsAction="ifRoom" />-->
 
-    <item
-        android:id="@+id/sign_out"
-        android:orderInCategory="100"
-        android:title="Sign out"
-        app:showAsAction="never" />
 
 </menu>

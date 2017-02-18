@@ -1,15 +1,11 @@
 package com.pashkobohdan.fastreading;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -22,17 +18,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
-import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.firebase.downloadBooks.FirebaseBook;
 import com.pashkobohdan.fastreading.library.ui.lists.downloadFirebaseBooks.FirebaseBooksListAdapter;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import static com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper.INTERNAL_FILE_EXTENSION;
 
@@ -46,6 +38,11 @@ public class Download extends AppCompatActivity {
 
     private List<FirebaseBook> books;
     private List<FirebaseBook> booksToListView = new LinkedList<>();
+
+    private ValueEventListener valueEventListener;
+
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
 
 
     @Override
@@ -117,12 +114,15 @@ public class Download extends AppCompatActivity {
         });
 
         ProgressDialog booksLoadingProgressDialog = new ProgressDialog(this);
-        booksLoadingProgressDialog.setMessage("Loading books");
+        booksLoadingProgressDialog.setTitle("Loading books");
+        booksLoadingProgressDialog.setMessage("You can close this dialog, data will be downloaded automatically");
         booksLoadingProgressDialog.show();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("books");
-        myRef.limitToFirst(1000).orderByChild("bookName").addValueEventListener(new ValueEventListener() {
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("books");
+
+
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 books = new LinkedList<>();
@@ -161,7 +161,7 @@ public class Download extends AppCompatActivity {
                     booksLoadingProgressDialog.show();
                 }
             }
-        });
+        };
     }
 
     private void refreshBooksList() {
@@ -182,6 +182,31 @@ public class Download extends AppCompatActivity {
         }
 
         firebaseBooksListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        myRef.limitToFirst(1000).orderByChild("bookName").addValueEventListener(valueEventListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        myRef.removeEventListener(valueEventListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 
     @Override

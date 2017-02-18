@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -71,6 +72,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             floatingActionButtonDownloadBook,
             floatingActionButtonCreateBook;
 
+    private MenuItem signInSignOut;
+
     /**
      * Sorting
      */
@@ -114,6 +117,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         booksRecyclerView = (RecyclerView) findViewById(R.id.books_recycler_view);
         booksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+
+        signInSignOut = (MenuItem) findViewById(R.id.sign_in_or_out);
 
         initFABsListeners();
 
@@ -211,6 +216,17 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_my_books, menu);
+
+        signInSignOut = menu.findItem(R.id.sign_in_or_out);
+
+        if(signInSignOut != null) {
+            if (mFirebaseAuth.getCurrentUser() != null) {
+                signInSignOut.setTitle(R.string.sign_out);
+            } else {
+                signInSignOut.setTitle(R.string.sign_in);
+            }
+        }
+
         return true;
     }
 
@@ -246,13 +262,13 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 }
                 break;
 
-            case R.id.action_back_sort_by_name:
-                if (!item.isChecked()) {
-                    booksSortType = BooksSortTypes.BY_BACK_NAME;
-                    refreshBookList();
-                    item.setChecked(true);
-                }
-                break;
+//            case R.id.action_back_sort_by_name:
+//                if (!item.isChecked()) {
+//                    booksSortType = BooksSortTypes.BY_BACK_NAME;
+//                    refreshBookList();
+//                    item.setChecked(true);
+//                }
+//                break;
 
             case R.id.action_sort_by_author:
                 if (!item.isChecked()) {
@@ -262,21 +278,24 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 }
                 break;
 
-            case R.id.action_back_sort_by_author:
-                if (!item.isChecked()) {
-                    booksSortType = BooksSortTypes.BY_BACK_AUTHOR;
-                    refreshBookList();
-                    item.setChecked(true);
-                }
+//            case R.id.action_back_sort_by_author:
+//                if (!item.isChecked()) {
+//                    booksSortType = BooksSortTypes.BY_BACK_AUTHOR;
+//                    refreshBookList();
+//                    item.setChecked(true);
+//                }
+//                break;
+
+            case R.id.sign_in_or_out:
+                signInOrOut();
                 break;
 
-            case R.id.sign_in:
-                signIn();
-                break;
 
-            case R.id.sign_out:
-                signOut();
-                break;
+//            case R.id.action_help:
+//                startActivity(new Intent(this, Help.class));
+//                break;
+
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -284,20 +303,24 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
 
     private Runnable signInSuccess = null;
-    private void signIn() {
+    private void signInOrOut() {
         if (mFirebaseAuth.getCurrentUser() != null) {
-            Toast.makeText(this, "You're already authorized", Toast.LENGTH_SHORT).show();
-            return;
+            mFirebaseAuth.signOut();
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+
+            Toast.makeText(this, "Sign out successfully !", Toast.LENGTH_SHORT).show();
+
+            if(signInSignOut != null) {
+                if (mFirebaseAuth.getCurrentUser() != null) {
+                    signInSignOut.setTitle(R.string.sign_out);
+                } else {
+                    signInSignOut.setTitle(R.string.sign_in);
+                }
+            }
+        }else{
+            Intent authorizeIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(authorizeIntent, RC_SIGN_IN);
         }
-
-        Intent authorizeIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(authorizeIntent, RC_SIGN_IN);
-    }
-    private void signOut() {
-        mFirebaseAuth.signOut();
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-
-        Toast.makeText(this, "Sign out successfully !", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -309,6 +332,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
+
             } else {
                 Toast.makeText(AllBooks.this, "Google Sign In failed", Toast.LENGTH_SHORT).show();
                 signInSuccess = null;
@@ -325,6 +349,15 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                         signInSuccess = null;
                     } else {
                         Toast.makeText(AllBooks.this, "Sign in successfully !", Toast.LENGTH_SHORT).show();
+
+                        if(signInSignOut != null) {
+                            if (mFirebaseAuth.getCurrentUser() != null) {
+                                signInSignOut.setTitle(R.string.sign_out);
+                            } else {
+                                signInSignOut.setTitle(R.string.sign_in);
+                            }
+                        }
+
                         if (signInSuccess != null) {
                             signInSuccess.run();
                         }
@@ -615,7 +648,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 startActivity(new Intent(AllBooks.this, Download.class));
                 signInSuccess = null;
             };
-            signIn();
+
+            signInOrOut();
         }
     }
 
