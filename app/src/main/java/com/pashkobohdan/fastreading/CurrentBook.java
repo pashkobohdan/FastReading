@@ -78,6 +78,7 @@ public class CurrentBook extends AppCompatActivity {
         STATUS_PLAYING,
         STATUS_PAUSE
     }
+
     private volatile ReadingStatus currentReadingStatus;
     private ArrayList<Word> words;
     private int readingPosition;
@@ -117,8 +118,9 @@ public class CurrentBook extends AppCompatActivity {
         if (!getBookInfo()) {
             new AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setMessage("Book loading error. Try later")
-                    .setPositiveButton("Ok", (dialog, which) -> finish())
+                    .setTitle(R.string.error)
+                    .setMessage(R.string.book_loading_error)
+                    .setPositiveButton(R.string.ok, (dialog, which) -> finish())
                     .show();
 
             return;
@@ -301,7 +303,7 @@ public class CurrentBook extends AppCompatActivity {
                     lastUserChangingReading = System.nanoTime();
 
                     newSpeedOnPlaying.setVisibility(View.VISIBLE);
-                    newSpeedOnPlaying.setText("Speed : " + bookInfo.getCurrentSpeed());
+                    newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
                     new Handler().postDelayed(() -> {
                         if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
                             newSpeedOnPlaying.setVisibility(View.GONE);
@@ -325,7 +327,7 @@ public class CurrentBook extends AppCompatActivity {
                     lastUserChangingReading = System.nanoTime();
 
                     newSpeedOnPlaying.setVisibility(View.VISIBLE);
-                    newSpeedOnPlaying.setText("Speed : " + bookInfo.getCurrentSpeed());
+                    newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
                     new Handler().postDelayed(() -> {
                         if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
                             newSpeedOnPlaying.setVisibility(View.GONE);
@@ -363,7 +365,6 @@ public class CurrentBook extends AppCompatActivity {
     }
 
 
-
     public boolean isColorDark(int color) {
         double darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
         return darkness >= 0.5;
@@ -376,7 +377,6 @@ public class CurrentBook extends AppCompatActivity {
             words.add(Word.newInstance(word));
         }
     }
-
 
 
     private void initializeStartReadingValues() {
@@ -488,15 +488,15 @@ public class CurrentBook extends AppCompatActivity {
                     } else {
                         if (words.get(getReadingPosition()).toString().length() > 10) {
                             startOfRestartPlaying((int) (MILLISECONDS_IN_ONE_MINUTE * TIME_DELTA_LONG_WORDS / bookInfo.getCurrentSpeed()));
-                        }else{
-                            if(words.get(getReadingPosition()).toString().endsWith(".") ||
+                        } else {
+                            if (words.get(getReadingPosition()).toString().endsWith(".") ||
                                     words.get(getReadingPosition()).toString().endsWith("!") ||
-                                    words.get(getReadingPosition()).toString().endsWith("?")||
-                                    words.get(getReadingPosition()).toString().endsWith(";") ){
+                                    words.get(getReadingPosition()).toString().endsWith("?") ||
+                                    words.get(getReadingPosition()).toString().endsWith(";")) {
                                 startOfRestartPlaying((int) (MILLISECONDS_IN_ONE_MINUTE * TIME_DELTA_DOT / bookInfo.getCurrentSpeed()));
-                            }else if (words.get(getReadingPosition()).toString().endsWith(",") ||
+                            } else if (words.get(getReadingPosition()).toString().endsWith(",") ||
                                     words.get(getReadingPosition()).toString().endsWith(":") ||
-                                    words.get(getReadingPosition()).toString().endsWith("-")){
+                                    words.get(getReadingPosition()).toString().endsWith("-")) {
                                 startOfRestartPlaying((int) (MILLISECONDS_IN_ONE_MINUTE * TIME_DELTA_COMA / bookInfo.getCurrentSpeed()));
                             }
                         }
@@ -532,7 +532,6 @@ public class CurrentBook extends AppCompatActivity {
     }
 
 
-
     private void hideSystemUI() {
         mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
@@ -540,7 +539,6 @@ public class CurrentBook extends AppCompatActivity {
     private void showSystemUI() {
         mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
     }
-
 
 
     private void startOfRestartPlaying(int initialDelay) {
@@ -563,13 +561,13 @@ public class CurrentBook extends AppCompatActivity {
     private void showBookEndDialog() {
         new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setMessage("Book end. Do you want to start again ?")
-                .setPositiveButton("Ok", (dialog, which) -> setReadingPosition(0))
-                .setNegativeButton("No", (dialog, which) -> {
+                .setTitle(R.string.book_end)
+                .setMessage(R.string.book_end_dialog_text)
+                .setPositiveButton(R.string.yes, (dialog, which) -> setReadingPosition(0))
+                .setNegativeButton(R.string.no, (dialog, which) -> {
                 })
                 .show();
     }
-
 
 
     public int getReadingPosition() {

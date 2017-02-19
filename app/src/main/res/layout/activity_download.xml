@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Book name, author or part of text"
+        android:hint="@string/book_name_author_or_part_of_text"
         android:inputType="textPersonName" />
 
     <ListView

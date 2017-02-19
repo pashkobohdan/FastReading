@@ -2,20 +2,16 @@ package com.pashkobohdan.fastreading.library.ui.dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.pashkobohdan.fastreading.R;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
-import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 
-import java.io.File;
 
 /**
  * Shows dialog when you want change ant book.
@@ -53,8 +49,8 @@ public class BookEditDialog {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 //.setTitle("Book's editing")
-                .setPositiveButton("Save", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, null)
                 .setView(textEntryView);
 
         alertDialog = builder.create();
@@ -74,9 +70,9 @@ public class BookEditDialog {
 
     private void showCancelDialog(Activity activity, DialogInterface editingDialogInterface) {
         AlertDialog.Builder cancelBuilder = new AlertDialog.Builder(activity);
-        cancelBuilder.setMessage("Do you want to cancel editing of this book ?")
-                .setPositiveButton("Yes", (dialog, which) -> editingDialogInterface.dismiss())
-                .setNegativeButton("No", (dialog, which) -> {
+        cancelBuilder.setMessage(R.string.editing_cancel_text)
+                .setPositiveButton(R.string.yes, (dialog, which) -> editingDialogInterface.dismiss())
+                .setNegativeButton(R.string.no, (dialog, which) -> {
                 })
                 .create()
                 .show();
@@ -85,10 +81,10 @@ public class BookEditDialog {
     private boolean tryEditBook(Activity activity, BookInfo bookInfo) {
         if (bookName.isErrorEnabled() || bookAuthor.isErrorEnabled()) {
             new AlertDialog.Builder(activity)
-                    .setPositiveButton("Ok", (dialog, which) -> {
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
                     })
-                    .setTitle("Information")
-                    .setMessage("Please, set the valid data")
+                    .setTitle(R.string.information)
+                    .setMessage(R.string.set_valid_data)
                     .create()
                     .show();
 
@@ -128,10 +124,10 @@ public class BookEditDialog {
             e.printStackTrace();
 
             new AlertDialog.Builder(activity)
-                    .setPositiveButton("Ok", (dialog, which) -> {
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
                     })
-                    .setTitle("Information")
-                    .setMessage("Please, set the valid data")
+                    .setTitle(R.string.information)
+                    .setMessage(R.string.set_valid_data)
                     .create()
                     .show();
 

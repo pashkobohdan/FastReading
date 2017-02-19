@@ -119,7 +119,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("My books");
+            getSupportActionBar().setTitle(R.string.activity_my_books_title);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
@@ -186,9 +186,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 setFeedbackDialogDismissible(true);
 
         twoStageRate.setFeedbackWithRatingReceivedListener((rating, feedback) -> {
-            if (!EmailFeedback.sendEmailToDeveloper(AllBooks.this, "Fast Reading. Feedback", "Rating : " + rating + "\n\n" + feedback)) {
-                Toast.makeText(AllBooks.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-            }
+            EmailFeedback.sendEmailToDeveloper(AllBooks.this, "Fast Reading. Feedback", "Rating : " + rating + "\n\n" + feedback);
         });
 
         /**
@@ -216,7 +214,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this, "Google Play Services error", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.google_service_error, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -375,7 +373,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             mFirebaseAuth.signOut();
             Auth.GoogleSignInApi.signOut(mGoogleApiClient);
 
-            Toast.makeText(this, "Sign out successfully !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.sign_out_ok, Toast.LENGTH_SHORT).show();
 
             if (signInSignOut != null) {
                 if (mFirebaseAuth.getCurrentUser() != null) {
@@ -401,7 +399,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 firebaseAuthWithGoogle(account);
 
             } else {
-                Toast.makeText(AllBooks.this, "Google Sign In failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AllBooks.this, R.string.sign_in_error, Toast.LENGTH_SHORT).show();
                 signInSuccess = null;
             }
         }
@@ -412,10 +410,10 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         mFirebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (!task.isSuccessful()) {
-                        Toast.makeText(AllBooks.this, "Authentication failed. Try later", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AllBooks.this, R.string.auth_error, Toast.LENGTH_SHORT).show();
                         signInSuccess = null;
                     } else {
-                        Toast.makeText(AllBooks.this, "Sign in successfully !", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AllBooks.this, R.string.sign_in_ok, Toast.LENGTH_SHORT).show();
 
                         if (signInSignOut != null) {
                             if (mFirebaseAuth.getCurrentUser() != null) {
@@ -530,13 +528,13 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             FirebaseBook book = new FirebaseBook(bookInfo.getName(), bookInfo.getAuthor(), bookInfo.getAllText());
 
             ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Book uploading");
-            progressDialog.setMessage("You can hide this message, uploading will continue in background");
+            progressDialog.setTitle(getString(R.string.dialog_book_upload_title));
+            progressDialog.setMessage(getString(R.string.dialog_book_upload_text));
             progressDialog.show();
 
             booksReference.push().setValue(book, (databaseError, databaseReference) -> {
                 progressDialog.dismiss();
-                Toast.makeText(AllBooks.this, "Book upload successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AllBooks.this, R.string.book_upload_success, Toast.LENGTH_SHORT).show();
             });
 
 
@@ -556,8 +554,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             };
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Do you want delete this record  : " + bookInfo.getName()).setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener).show();
+            builder.setMessage(getString(R.string.delete_confirm_1) + bookInfo.getName()).setPositiveButton(R.string.yes, dialogClickListener)
+                    .setNegativeButton(R.string.no, dialogClickListener).show();
         }, (bookInfo) -> {
 
             if (!checkBookReady(bookInfo)) {
@@ -570,7 +568,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
         }, (bookInfo) -> {
 
-            Toast.makeText(this, "long click : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "long click : " + bookInfo.getName(), Toast.LENGTH_SHORT).show();
 
         });
 
@@ -585,10 +583,10 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         if (bookInfo.isWasRead()) {
             if (bookInfo.getWords().length < 1) {
                 new AlertDialog.Builder(this)
-                        .setPositiveButton("Ok", (dialog, which) -> {
+                        .setPositiveButton(R.string.yes, (dialog, which) -> {
                         })
-                        .setTitle("Information")
-                        .setMessage("This book is empty. Try delete book and open again")
+                        .setTitle(R.string.information)
+                        .setMessage(R.string.book_is_empty)
                         .create()
                         .show();
 
@@ -597,8 +595,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             return true;
         } else {
             new AlertDialog.Builder(this)
-                    .setTitle("Information")
-                    .setMessage("The book has not read yet.\nPlease, wait few second")
+                    .setTitle(R.string.information)
+                    .setMessage(R.string.book_still_opening)
                     .create()
                     .show();
 
@@ -618,7 +616,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     private void openFileChooserDialog() {
         FileChooserDialog.Builder builder =
                 new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, this)
-                        .setTitle("Select a file:")
+                        .setTitle(getString(R.string.select_file_dialog_title))
                         .setFileFormats(new String[]{".txt", ".pdf", ".fb2"});
         try {
             builder.build().show(getSupportFragmentManager(), null);
@@ -647,8 +645,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             builder.setMessage("Do you want to rewrite this book \"" +
                     bookName +
                     "\" ?")
-                    .setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener)
+                    .setPositiveButton(R.string.yes, dialogClickListener)
+                    .setNegativeButton(R.string.no, dialogClickListener)
                     .show();
 
         } else {
@@ -659,8 +657,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     private void openFileWithUI(File inputFile) {
         final Activity activity = this;
         final ProgressDialog pd = new ProgressDialog(activity);
-        pd.setTitle("Reading");
-        pd.setMessage("Please, wait while book loading.\nYou can use another apps at this time");
+        pd.setTitle(getString(R.string.reading_dialog_title));
+        pd.setMessage(getString(R.string.reading_dialog_text));
         pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         pd.setMax(100);
         pd.setProgress(0);

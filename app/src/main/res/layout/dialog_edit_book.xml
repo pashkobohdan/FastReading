@@ -19,7 +19,7 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Book's name" />
+                android:text="@string/book_s_name" />
 
 
             <android.support.design.widget.TextInputLayout
@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Book's author" />
+                android:text="@string/book_s_author" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/dialog_edit_book_books_author"
@@ -70,14 +70,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Book's text" />
+                android:text="@string/book_s_text" />
 
 
             <EditText
                 android:id="@+id/dialog_edit_book_books_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/textView3"
                 android:ems="10"
                 android:inputType="textMultiLine|textNoSuggestions" />
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 
+import com.pashkobohdan.fastreading.R;
 import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
 import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
 import com.pashkobohdan.fastreading.library.fileSystem.file.core.FileWriteResult;
@@ -53,7 +54,7 @@ public class BookInfoFactory {
 
         bookInfo.setName(bookInfo.getBookNamesPreferences().getString(bookInfo.getFileName(), bookInfo.getFileName()));
         bookInfo.setCurrentWordNumber(bookInfo.getBookPositionsPreferences().getInt(bookInfo.getFileName(), 0));
-        bookInfo.setAuthor(bookInfo.getBookAuthorsPreferences().getString(bookInfo.getFileName(), "no author"));
+        bookInfo.setAuthor(bookInfo.getBookAuthorsPreferences().getString(bookInfo.getFileName(), activity.getString(R.string.no_author)));
 
         Random random = new Random(System.nanoTime());
         bookInfo.setColor(bookInfo.getBookColorsPreferences().getInt(bookInfo.getFileName(),

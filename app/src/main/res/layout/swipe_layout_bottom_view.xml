@@ -17,7 +17,7 @@
             android:clickable="true"
             android:gravity="center"
             android:padding="1dp"
-            android:text="Edit"
+            android:text="@string/edit"
             android:textColor="#fff" />
 
         <TextView
@@ -28,7 +28,7 @@
             android:clickable="true"
             android:gravity="center"
             android:padding="1dp"
-            android:text="Share"
+            android:text="@string/share"
             android:textColor="#fff" />
 
         <TextView
@@ -39,7 +39,7 @@
             android:clickable="true"
             android:gravity="center"
             android:padding="1dp"
-            android:text="Upload"
+            android:text="@string/upload"
             android:textColor="#fff" />
 
         <TextView
@@ -49,7 +49,49 @@
             android:background="#f48086"
             android:gravity="center"
             android:padding="1dp"
-            android:text="Delete" />
+            android:text="@string/delete" />
+
+        <!--<TextView-->
+            <!--android:id="@+id/edit_book"-->
+            <!--android:layout_width="70dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="#7ec5e6"-->
+            <!--android:clickable="true"-->
+            <!--android:gravity="center"-->
+            <!--android:padding="1dp"-->
+            <!--android:text="@string/edit"-->
+            <!--android:textColor="#fff" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/share_book"-->
+            <!--android:layout_width="70dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="#7e95e6"-->
+            <!--android:clickable="true"-->
+            <!--android:gravity="center"-->
+            <!--android:padding="1dp"-->
+            <!--android:text="@string/share"-->
+            <!--android:textColor="#fff" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/upload_book"-->
+            <!--android:layout_width="70dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="#ad7ee6"-->
+            <!--android:clickable="true"-->
+            <!--android:gravity="center"-->
+            <!--android:padding="1dp"-->
+            <!--android:text="@string/upload"-->
+            <!--android:textColor="#fff" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/delete_book"-->
+            <!--android:layout_width="70dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="#f48086"-->
+            <!--android:gravity="center"-->
+            <!--android:padding="1dp"-->
+            <!--android:text="@string/delete" />-->
     </LinearLayout>
 
 </RelativeLayout>

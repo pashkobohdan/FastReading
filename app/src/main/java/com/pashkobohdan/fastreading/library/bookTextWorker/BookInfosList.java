@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by bohdan on 02.02.17.
+ * Created by Bohdan Pashko on 02.02.17.
  */
 
 public class BookInfosList {
@@ -18,17 +18,6 @@ public class BookInfosList {
             bookInfos.add(bookInfo);
             return true;
         }
-    }
-
-    public static boolean delete(File file){
-        for(BookInfo bookInfo : bookInfos){
-            if(bookInfo.getFile().getAbsolutePath().equals(file.getAbsolutePath())){
-                bookInfos.remove(bookInfo);
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public static BookInfo get(File file){

@@ -8,7 +8,6 @@
     <TextView
         android:textSize="20sp"
         android:ellipsize="end"
-        android:text="Book name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/firebase_book_name" />
@@ -17,7 +16,6 @@
         android:layout_marginTop="2dp"
         android:layout_below="@+id/firebase_book_name"
         android:ellipsize="end"
-        android:text="Author"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/firebase_book_author" />
@@ -27,7 +25,6 @@
         android:maxLines="2"
         android:layout_below="@+id/firebase_book_author"
         android:ellipsize="end"
-        android:text="Part of text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/firebase_book_text" />

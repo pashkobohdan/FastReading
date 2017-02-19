@@ -27,9 +27,7 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".Download"
-            android:label="Cloud books" />
-
-        <activity android:name=".Help"/>
+            android:label="@string/download_activity_title" />
 
         <activity android:name=".WelcomeActivity"
             android:theme="@style/AppTheme.NoActionBar"/>

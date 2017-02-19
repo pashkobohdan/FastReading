@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolder> {
-    public static final String PERCENT_SYMBOL = " %";
+    private static final String PERCENT_SYMBOL = " %";
 
     private Activity activity;
 

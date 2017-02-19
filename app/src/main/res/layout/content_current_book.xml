@@ -70,15 +70,13 @@
                         <TextView
                             android:id="@+id/current_book_left_part"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="left" />
+                            android:layout_height="wrap_content" />
 
 
                         <TextView
                             android:id="@+id/current_book_center_part"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="center" />
+                            android:layout_height="wrap_content" />
 
                     </LinearLayout>
 
@@ -93,8 +91,7 @@
                         <TextView
                             android:id="@+id/current_book_right_part"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="right" />
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -163,7 +160,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="160"
                 android:textColor="@color/white" />
 
             <RelativeLayout

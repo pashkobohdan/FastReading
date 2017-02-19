@@ -2,7 +2,6 @@ package com.pashkobohdan.fastreading.library.ui.dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
@@ -12,13 +11,11 @@ import android.widget.EditText;
 import com.pashkobohdan.fastreading.R;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
-import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
-import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.ui.lists.booksList.BookEventListener;
 
 /**
- * Created by bohdan on 15.02.17.
+ * Created by Bohda Pashko on 15.02.17.
  */
 
 public class BookAddDialog {
@@ -43,8 +40,8 @@ public class BookAddDialog {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 //.setTitle("Book cre")
-                .setPositiveButton("Save", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, null)
                 .setView(textEntryView);
 
         alertDialog = builder.create();
@@ -63,9 +60,9 @@ public class BookAddDialog {
 
     private void showCancelDialog(Activity activity, DialogInterface editingDialogInterface) {
         AlertDialog.Builder cancelBuilder = new AlertDialog.Builder(activity);
-        cancelBuilder.setMessage("Do you want to cancel editing of this book ?")
-                .setPositiveButton("Yes", (dialog, which) -> editingDialogInterface.dismiss())
-                .setNegativeButton("No", (dialog, which) -> {
+        cancelBuilder.setMessage(R.string.editing_cancel_text)
+                .setPositiveButton(R.string.yes, (dialog, which) -> editingDialogInterface.dismiss())
+                .setNegativeButton(R.string.no, (dialog, which) -> {
                 })
                 .create()
                 .show();
@@ -74,10 +71,10 @@ public class BookAddDialog {
     private boolean tryEditBook(Activity activity) {
         if (bookName.isErrorEnabled() || bookAuthor.isErrorEnabled()) {
             new AlertDialog.Builder(activity)
-                    .setPositiveButton("Ok", (dialog, which) -> {
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
                     })
-                    .setTitle("Information")
-                    .setMessage("Please, set the valid data")
+                    .setTitle(R.string.information)
+                    .setMessage(R.string.set_valid_data)
                     .create()
                     .show();
 
@@ -99,19 +96,19 @@ public class BookAddDialog {
                     return true;
                 }else{
                     new AlertDialog.Builder(activity)
-                            .setPositiveButton("Ok", (dialog, which) -> {
+                            .setPositiveButton(R.string.ok, (dialog, which) -> {
                             })
-                            .setTitle("Error")
-                            .setMessage("Book writing error")
+                            .setTitle(R.string.error)
+                            .setMessage(R.string.book_write_error)
                             .create()
                             .show();
                 }
             }else{
                 new AlertDialog.Builder(activity)
-                        .setPositiveButton("Ok", (dialog, which) -> {
+                        .setPositiveButton(R.string.ok, (dialog, which) -> {
                         })
-                        .setTitle("Information")
-                        .setMessage("Please, set the valid data")
+                        .setTitle(R.string.information)
+                        .setMessage(R.string.set_valid_data)
                         .create()
                         .show();
             }
@@ -121,10 +118,10 @@ public class BookAddDialog {
             e.printStackTrace();
 
             new AlertDialog.Builder(activity)
-                    .setPositiveButton("Ok", (dialog, which) -> {
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
                     })
-                    .setTitle("Information")
-                    .setMessage("Please, set the valid data")
+                    .setTitle(R.string.information)
+                    .setMessage(R.string.set_valid_data)
                     .create()
                     .show();
 

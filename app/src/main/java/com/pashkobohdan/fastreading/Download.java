@@ -64,15 +64,9 @@ public class Download extends AppCompatActivity {
          * Data check
          */
         if (BookInfosList.getAll().size() == 0) {
-            ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Loading local books info");
-            progressDialog.show();
-
             for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
                 BookInfosList.add(BookInfoFactory.newInstance(file, this));
             }
-
-            progressDialog.dismiss();
         }
 
 
@@ -102,20 +96,20 @@ public class Download extends AppCompatActivity {
 
             BookInfo newBookInfo = BookInfoFactory.createNewInstance(new BookReadingResult(book.getBookText(), book.getBookName(), book.getBookAuthor()), this);
             if (newBookInfo == null) {
-                Toast.makeText(this, "File writing error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.file_writing_error, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             BookInfosList.getAll().add(newBookInfo);
-            Toast.makeText(this, "Book write successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.book_write_success, Toast.LENGTH_SHORT).show();
 
             books.remove(book);
             refreshBooksList();
         });
 
         ProgressDialog booksLoadingProgressDialog = new ProgressDialog(this);
-        booksLoadingProgressDialog.setTitle("Loading books");
-        booksLoadingProgressDialog.setMessage("You can close this dialog, data will be downloaded automatically");
+        booksLoadingProgressDialog.setTitle(getString(R.string.loading_books));
+        booksLoadingProgressDialog.setMessage(getString(R.string.loading_books_text));
         booksLoadingProgressDialog.show();
 
         database = FirebaseDatabase.getInstance();
