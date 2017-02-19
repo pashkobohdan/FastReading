@@ -41,6 +41,8 @@ import static android.view.KeyEvent.KEYCODE_VOLUME_UP;
 public class CurrentBook extends AppCompatActivity {
     public static final String BOOK_INFO_EXTRA_NAME = "serializable_book_file";
     public static final double TIME_DELTA_LONG_WORDS = 1.5;
+    public static final double TIME_DELTA_DOT = 1.5;
+    public static final double TIME_DELTA_COMA = 1.3;
     public static final int RESTART_TIMER_TASK_ONLINE = -1;
     public static final int SPEED_CHANGE_STEP = 20;
     public static final int SPEED_MIN_VALUE = 20;
@@ -486,6 +488,17 @@ public class CurrentBook extends AppCompatActivity {
                     } else {
                         if (words.get(getReadingPosition()).toString().length() > 10) {
                             startOfRestartPlaying((int) (MILLISECONDS_IN_ONE_MINUTE * TIME_DELTA_LONG_WORDS / bookInfo.getCurrentSpeed()));
+                        }else{
+                            if(words.get(getReadingPosition()).toString().endsWith(".") ||
+                                    words.get(getReadingPosition()).toString().endsWith("!") ||
+                                    words.get(getReadingPosition()).toString().endsWith("?")||
+                                    words.get(getReadingPosition()).toString().endsWith(";") ){
+                                startOfRestartPlaying((int) (MILLISECONDS_IN_ONE_MINUTE * TIME_DELTA_DOT / bookInfo.getCurrentSpeed()));
+                            }else if (words.get(getReadingPosition()).toString().endsWith(",") ||
+                                    words.get(getReadingPosition()).toString().endsWith(":") ||
+                                    words.get(getReadingPosition()).toString().endsWith("-")){
+                                startOfRestartPlaying((int) (MILLISECONDS_IN_ONE_MINUTE * TIME_DELTA_COMA / bookInfo.getCurrentSpeed()));
+                            }
                         }
                     }
 

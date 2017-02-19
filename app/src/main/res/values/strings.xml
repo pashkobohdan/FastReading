@@ -113,4 +113,20 @@
     <string name="send_crash_report_message">Do you want to send report to developer ? This will help us a lot</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="easy_book_opening">Easy book opening</string>
+    <string name="books_management">Books management</string>
+    <string name="sorst_and_settings">Sorts and settings</string>
+    <string name="easy_book_opening_text">Click button to add new book. You can open, create or download book</string>
+    <string name="books_management_text">Swipe book left to manage it</string>
+    <string name="sorst_and_settings_text">Choose books sort method. Go to Setting and set up the reading</string>
+    <string name="easy_reading">Easy reading</string>
+    <string name="easy_reading_text">Click anywhere to start/stop. Click volume buttons to change speed</string>
+    <string name="easy_management">Easy management</string>
+    <string name="easy_management_text">Rewind words and sentences. Long press to rewind faster</string>
+    <string name="reading_settings">Reading settings</string>
+    <string name="reading_settings_text">Cancel last rewind or start over</string>
+
+    <string name="first_book_name">First book. Click me</string>
+    <string name="first_book_author">no author</string>
+    <string name="first_book_text">To start reading just click anywhere on white space. To change speed - change volume on your device. To manage book - swipe left. To add new books click rounf button</string>
 </resources>

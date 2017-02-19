@@ -55,8 +55,7 @@ public class AnyFileOpening {
      * @return text of input file (without excess white spaces)
      */
     public static BookReadingResult open(@NonNull File file, final @NonNull Activity activity,
-                                            @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender,
-                                            @NonNull PercentSender writingPercentSender, @NonNull Runnable writingEndSender) {
+                                            @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEndSender) {
         if (!file.canRead() || file.length() < 1) {
             return null;
         }

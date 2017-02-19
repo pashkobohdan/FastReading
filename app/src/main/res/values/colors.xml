@@ -12,6 +12,12 @@
     <color name="white">#FFFFFF</color>
     <color name="green">#00ff00</color>
 
+    <color name="welcome_1">#009662</color>
+    <color name="welcome_2">#002396</color>
+    <color name="welcome_3">#820096</color>
+    <color name="welcome_4">#96003c</color>
+    <color name="welcome_5">#963700</color>
+    <color name="welcome_6">#009662</color>
 
     <color name="black_semi_transparent">#B2000000</color>
 

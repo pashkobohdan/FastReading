@@ -20,14 +20,11 @@ public class FileOpenThread extends Thread {
 
     public FileOpenThread(@NonNull final File file, @NonNull final Activity activity,
                           @NonNull PercentSender readingPercentSender, @NonNull Runnable readingEnd,
-                          @NonNull PercentSender writingPercentSender, @NonNull Runnable writingEnd,
                           @NonNull FileOpenResultSender fileOpeningEnd) {
         super(() -> {
             BookReadingResult outputFile = AnyFileOpening.open(file, activity,
                     (oldValue, neValue) -> activity.runOnUiThread(() -> readingPercentSender.refreshPercents(oldValue, neValue)),
-                    () -> activity.runOnUiThread(readingEnd),
-                    (oldValue, neValue) -> activity.runOnUiThread(() -> writingPercentSender.refreshPercents(oldValue, neValue)),
-                    () -> activity.runOnUiThread(writingEnd));
+                    () -> activity.runOnUiThread(readingEnd));
 
             activity.runOnUiThread(() -> fileOpeningEnd.send(outputFile));
         });

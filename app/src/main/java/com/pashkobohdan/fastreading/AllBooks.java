@@ -8,11 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -32,25 +32,21 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.honu.aloha.WelcomeHelper;
-import com.morsebyte.shailesh.twostagerating.FeedbackReceivedListener;
-import com.morsebyte.shailesh.twostagerating.FeedbackWithRatingReceivedListener;
 import com.morsebyte.shailesh.twostagerating.TwoStageRate;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
+import com.pashkobohdan.fastreading.library.feedback.EmailCrashReport;
 import com.pashkobohdan.fastreading.library.feedback.EmailFeedback;
 import com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper;
-import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.AnyBookOpeningResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpening.core.BookReadingResult;
 import com.pashkobohdan.fastreading.library.fileSystem.newFileOpeningThread.FileOpenThread;
 import com.pashkobohdan.fastreading.library.firebase.downloadBooks.FirebaseBook;
 import com.pashkobohdan.fastreading.library.ui.dialogs.BookAddDialog;
 import com.pashkobohdan.fastreading.library.ui.dialogs.BookEditDialog;
-import com.pashkobohdan.fastreading.library.ui.lists.booksList.BookEventListener;
 import com.pashkobohdan.fastreading.library.ui.lists.booksList.BooksRecyclerViewAdapter;
 
 import java.io.File;
@@ -141,6 +137,15 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         initFABsListeners();
 
 
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("first_start", true)) {
+            BookInfo firstBook = BookInfoFactory.createNewInstance(new BookReadingResult(getResources().getString(R.string.first_book_text), getResources().getString(R.string.first_book_name), getResources().getString(R.string.first_book_author)), this);
+            if(firstBook == null){
+                EmailCrashReport.sendCrashReport(this, new Exception("Cannot create first book. Device : "+System.getProperties().toString()));
+            }
+
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("first_start", false).apply();
+        }
+
         // if data is already loaded
         if (BookInfosList.getAll().size() == 0) {
             initBookInfoData();
@@ -155,15 +160,18 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
          * Init rate this app
          */
         twoStageRate = TwoStageRate.with(this);
-        twoStageRate.setInstallDays(3).setLaunchTimes(5).setEventsTimes(3);
-
-        twoStageRate.setFeedbackReceivedListener(feedback -> Toast.makeText(AllBooks.this, feedback, Toast.LENGTH_SHORT).show());
+        twoStageRate
+                .setInstallDays(3)
+                .setLaunchTimes(5)
+                .setEventsTimes(3)
+                .setFeedbackReceivedListener(feedback -> Toast.makeText(AllBooks.this, feedback, Toast.LENGTH_SHORT).show());
 
         twoStageRate.setRatePromptTitle(getString(R.string.rate_prompt_title)).
                 setRatePromptDismissible(false).
                 resetOnDismiss(true).
                 resetOnFeedBackDeclined(true).
-                resetOnRatingDeclined(true);
+                resetOnRatingDeclined(true)
+                .setShowAppIcon(false);
 
         twoStageRate.setConfirmRateDialogTitle(getString(R.string.confirm_rate_title)).
                 setConfirmRateDialogDescription(getString(R.string.confirm_rate_description)).
@@ -661,20 +669,6 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         pd.show();
 
         new FileOpenThread(inputFile, this, (o, n) -> {
-            pd.setIndeterminate(false);
-            pd.setProgress(n);
-        }, () -> {
-            pd.dismiss();
-
-            pd.setTitle("Writing");
-            pd.setMessage("Please, wait");
-            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            pd.setMax(100);
-            pd.setProgress(0);
-            pd.setIndeterminate(true);
-            pd.setCancelable(false);
-            pd.show();
-        }, (o, n) -> {
             pd.setIndeterminate(false);
             pd.setProgress(n);
         }, pd::dismiss, bookOpeningResult -> {
