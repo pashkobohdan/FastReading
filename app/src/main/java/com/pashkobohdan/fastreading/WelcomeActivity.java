@@ -1,7 +1,5 @@
 package com.pashkobohdan.fastreading;
 
-import android.graphics.Color;
-
 import com.honu.aloha.BaseWelcomeActivity;
 import com.honu.aloha.PageDescriptor;
 

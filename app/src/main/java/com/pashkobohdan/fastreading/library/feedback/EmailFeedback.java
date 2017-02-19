@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 
 /**
- * Created by bohdan on 18.02.17.
+ * Created by Bohdan Pashko on 18.02.17.
  */
 
 public class EmailFeedback {
-    public static final String DEVELOPER_EMAIL = "b.s.apps.company@gmail.com";
+    private static final String DEVELOPER_EMAIL = "b.s.apps.company@gmail.com";
 
 
     public static boolean sendEmailToDeveloper(Activity activity, String theme, String text){

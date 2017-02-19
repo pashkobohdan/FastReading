@@ -109,4 +109,8 @@
     <string name="feedback_description">Could you tell us what problem you faced? This will help us a lot</string>
     <string name="feedback_positive">Submit</string>
     <string name="feedback_negative">No Thanks</string>
+    <string name="send_crash_report_title">Send crash report</string>
+    <string name="send_crash_report_message">Do you want to send report to developer ? This will help us a lot</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

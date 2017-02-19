@@ -156,7 +156,6 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
          */
         twoStageRate = TwoStageRate.with(this);
         twoStageRate.setInstallDays(3).setLaunchTimes(5).setEventsTimes(3);
-        twoStageRate.resetOnDismiss(true).resetOnFeedBackDeclined(true).resetOnRatingDeclined(false);
 
         twoStageRate.setFeedbackReceivedListener(feedback -> Toast.makeText(AllBooks.this, feedback, Toast.LENGTH_SHORT).show());
 
