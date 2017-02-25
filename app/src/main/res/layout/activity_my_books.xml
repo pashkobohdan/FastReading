@@ -46,7 +46,7 @@
             fab:fab_colorNormal="@color/fab_normal"
             fab:fab_colorPressed="@color/fab_pressed"
             fab:fab_size="mini"
-            fab:fab_title="Open PDF, FB2 or TXT file" />
+            fab:fab_title="@string/open_book_fab" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/book_list_download_book_from_cloud"
@@ -55,7 +55,7 @@
             fab:fab_colorNormal="@color/fab_normal"
             fab:fab_colorPressed="@color/fab_pressed"
             fab:fab_size="mini"
-            fab:fab_title="Download from cloud" />
+            fab:fab_title="@string/download_fab" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/book_list_create_new_book"
@@ -64,7 +64,7 @@
             fab:fab_colorNormal="@color/fab_normal"
             fab:fab_colorPressed="@color/fab_pressed"
             fab:fab_size="mini"
-            fab:fab_title="Create new book" />
+            fab:fab_title="@string/create_book_fab" />
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 

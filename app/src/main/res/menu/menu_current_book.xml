@@ -8,13 +8,13 @@
     <item
         android:id="@+id/action_to_start"
         android:orderInCategory="100"
-        android:title="To start"
+        android:title="@string/to_start"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_cancel_last_rewind"
         android:orderInCategory="100"
-        android:title="Cancel last rewind"
+        android:title="@string/cancel_last_rewind"
         app:showAsAction="never" />
 
     <item

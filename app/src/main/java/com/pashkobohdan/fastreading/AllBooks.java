@@ -642,9 +642,9 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             };
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Do you want to rewrite this book \"" +
+            builder.setMessage(getString(R.string.book_rewriting_confirm) + "\"" +
                     bookName +
-                    "\" ?")
+                    "\"")
                     .setPositiveButton(R.string.yes, dialogClickListener)
                     .setNegativeButton(R.string.no, dialogClickListener)
                     .show();
@@ -680,7 +680,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     private void addNewBookToBooksList(BookReadingResult bookOpeningResult) {
         BookInfo newBookInfo = BookInfoFactory.createNewInstance(bookOpeningResult, this);
         if (newBookInfo == null) {
-            Toast.makeText(this, "Book writing error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.book_writing_error, Toast.LENGTH_SHORT).show();
             return;
         }
 

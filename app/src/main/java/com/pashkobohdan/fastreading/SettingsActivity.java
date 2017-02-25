@@ -186,6 +186,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("text_size"));
+            bindPreferenceSummaryToValue(findPreference("boundary_lines_thickness"));
 //            bindPreferenceSummaryToValue(findPreference("word_color"));
 //            bindPreferenceSummaryToValue(findPreference("center_letter_color"));
         }

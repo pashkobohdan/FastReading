@@ -37,6 +37,16 @@
             android:title="Boundary lines color"
             app:colorShape="circle" />
 
+        <ListPreference
+            android:dependency="boundary_lines"
+            android:defaultValue="2"
+            android:entries="@array/pref_boundary_lines_width_values"
+            android:entryValues="@array/pref_boundary_lines_width_values"
+            android:key="boundary_lines_thickness"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="Thickness of the boundary lines" />
+
     </PreferenceCategory>
 
 

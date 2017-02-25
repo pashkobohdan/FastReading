@@ -23,7 +23,7 @@ public class EmailCrashReport {
                     PrintWriter pw = new PrintWriter(sw);
                     exception.printStackTrace(pw);
 
-                    EmailFeedback.sendEmailToDeveloper(activity, "", sw.toString());
+                    EmailFeedback.sendEmailToDeveloper(activity, "Fast Reading. Exception", sw.toString());
                 })
                 .setNegativeButton(R.string.no, (dialog, which) -> {
                 }).create().show();

@@ -48,7 +48,7 @@
                 <TextView
                     android:id="@+id/current_book_top_boundary_line"
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
+                    android:layout_height="2px"
                     android:background="@color/black" />
 
                 <LinearLayout
@@ -100,7 +100,7 @@
                 <TextView
                     android:id="@+id/current_book_bottom_boundary_line"
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
+                    android:layout_height="2px"
                     android:background="@color/black" />
 
             </LinearLayout>

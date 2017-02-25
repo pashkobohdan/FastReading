@@ -9,20 +9,20 @@
             android:id="@+id/action_sort_by_last_open"
             android:checked="true"
             android:orderInCategory="100"
-            android:title="Sort by last opening"
+            android:title="@string/sort_by_last_opening"
             app:showAsAction="never" />
 
 
         <item
             android:id="@+id/action_sort_by_progress"
             android:orderInCategory="100"
-            android:title="Sort by progress"
+            android:title="@string/sort_by_progress"
             app:showAsAction="never" />
 
         <item
             android:id="@+id/action_sort_by_name"
             android:orderInCategory="100"
-            android:title="Sort by name"
+            android:title="@string/sort_by_name"
             app:showAsAction="never" />
 
         <!--<item-->
@@ -34,7 +34,7 @@
         <item
             android:id="@+id/action_sort_by_author"
             android:orderInCategory="100"
-            android:title="Sort by author"
+            android:title="@string/sort_by_author"
             app:showAsAction="never" />
 
         <!--<item-->
@@ -63,7 +63,7 @@
     <item
         android:id="@+id/rate_app"
         android:orderInCategory="100"
-        android:title="Rate this app"
+        android:title="@string/rate_this_app"
         app:showAsAction="ifRoom" />
 
 

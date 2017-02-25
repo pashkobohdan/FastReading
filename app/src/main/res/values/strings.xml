@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Fast Reading</string>
+    <string name="app_name" translatable="false">Fast Reading</string>
     <string name="action_settings">Settings</string>
     <string name="activity_my_books_title">All Books</string>
     <string name="title_activity_settings">Settings</string>
@@ -25,6 +25,15 @@
         <item>70</item>
         <item>75</item>
         <item>80</item>
+    </string-array>
+
+    <string-array name="pref_boundary_lines_width_values">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
     </string-array>
     <string name="pref_title_ringtone">Ringtone</string>
     <string name="pref_ringtone_silent">Silent</string>
@@ -65,7 +74,7 @@
 
     <string name="first_book_name">First book. Click me</string>
     <string name="first_book_author">no author</string>
-    <string name="first_book_text">To start reading just click anywhere on white space. To change speed - change volume on your device. To manage book - swipe left. To add new books click rounf button</string>
+    <string name="first_book_text">To start reading just click anywhere on white space. To change speed - change volume on your device. To manage book - swipe left. To add new books click round button</string>
     <string name="google_service_error">Google Play Services error</string>
     <string name="download_activity_title">Cloud books</string>
     <string name="email_client_not_found">There are no email clients installed</string>
@@ -108,4 +117,16 @@
     <string name="upload">Upload</string>
     <string name="delete">Delete</string>
     <string name="refreshing">refreshing …</string>
+    <string name="book_writing_error">Book writing error</string>
+    <string name="book_rewriting_confirm">"Do you want to rewrite this book ? "</string>
+    <string name="to_start">To start</string>
+    <string name="cancel_last_rewind">Cancel last rewind</string>
+    <string name="sort_by_last_opening">Sort by last opening</string>
+    <string name="sort_by_progress">Sort by progress</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_author">Sort by author</string>
+    <string name="rate_this_app">Rate this app</string>
+    <string name="open_book_fab">Open PDF, FB2 or TXT file</string>
+    <string name="download_fab">Download from cloud</string>
+    <string name="create_book_fab">Create new book</string>
 </resources>

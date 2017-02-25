@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -32,6 +33,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.os.Handler;
+import android.widget.Toast;
 
 
 import static android.view.KeyEvent.KEYCODE_BACK;
@@ -193,6 +195,7 @@ public class CurrentBook extends AppCompatActivity {
         int textSize = Integer.parseInt(preferences.getString("text_size", "20"));
         int boundaryLinesColor = preferences.getInt("boundary_lines_color", R.color.boundary_lines_color_default);
         int backgroundColor = preferences.getInt("background_color", getResources().getColor(R.color.white));
+        int boundaryLines_thickness = Integer.parseInt(preferences.getString("boundary_lines_thickness", "2"));
 
         hideStatusBarForReading = preferences.getBoolean("hide_status_bar", false);
         //getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -210,13 +213,23 @@ public class CurrentBook extends AppCompatActivity {
         if (showBoundaryLines) {
             topBoundaryLine.setVisibility(View.VISIBLE);
             bottomBoundaryLine.setVisibility(View.VISIBLE);
+
+
+            ViewGroup.LayoutParams params = topBoundaryLine.getLayoutParams();
+            params.height = boundaryLines_thickness;
+            topBoundaryLine.setLayoutParams(params);
+
+            params = bottomBoundaryLine.getLayoutParams();
+            params.height = boundaryLines_thickness;
+            bottomBoundaryLine.setLayoutParams(params);
+
+
+            topBoundaryLine.setBackgroundColor(boundaryLinesColor);
+            bottomBoundaryLine.setBackgroundColor(boundaryLinesColor);
         } else {
             topBoundaryLine.setVisibility(View.GONE);
             bottomBoundaryLine.setVisibility(View.GONE);
         }
-
-        topBoundaryLine.setBackgroundColor(boundaryLinesColor);
-        bottomBoundaryLine.setBackgroundColor(boundaryLinesColor);
 
         currentWordLeftPart.setTextColor(wordColor);
         currentWordRightPart.setTextColor(wordColor);
