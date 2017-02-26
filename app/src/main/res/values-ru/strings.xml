@@ -17,7 +17,7 @@
     <string name="book_still_opening">Книга еще не загружена. Пожалуйста, подождите несколько секунд</string>
     <string name="book_upload_success">Книга загружена</string>
     <string name="book_write_error">Ошибка записи книги</string>
-    <string name="book_write_success">Книг азаписана</string>
+    <string name="book_write_success">Книга записана</string>
     <string name="book_writing_error">Ошибка записи книги</string>
     <string name="books_management">Управление книгами</string>
     <string name="books_management_text">Проведите влево чтобы управлять</string>
@@ -96,4 +96,23 @@
     <string name="open_book_fab">Открыть PDF, FB2 или TXT книгу</string>
     <string name="create_book_fab">Создать книгу</string>
     <string name="download_fab">Скачать книгу с хранилища</string>
+    <string name="settings_another_center_color">Другой цвет для центральной буквы</string>
+    <string name="settings_back_color">Цвет фона</string>
+    <string name="settings_boundary">Ограничительные линии</string>
+    <string name="settings_back_color_summary">Цвет поверхности для чтения (задний фон)</string>
+    <string name="settings_boundary_color">Цвет ограничительных линий</string>
+    <string name="settings_boundary_color_summary">Если вам не нужны эти линии - выключите их</string>
+    <string name="settings_boundary_thickness">Толщина ограничительных линий</string>
+    <string name="settings_center_color">Цвет  центральной буквы</string>
+    <string name="settings_center_color_summary">Включите чтобы отличать центральную букву от остальных</string>
+    <string name="settings_enable_boundary_lines">Включить ограничительные линии</string>
+    <string name="settings_enable_boundary_summary">Для лучшей фокусировки на слове</string>
+    <string name="settings_hide_bar">Спрятать статусную строку при чтении</string>
+    <string name="settings_hide_bar_summary">Чистая поверхность для чтения</string>
+    <string name="settings_skin">Внешний вид</string>
+    <string name="settings_text">Текст</string>
+    <string name="settings_text_size">Размер текста</string>
+    <string name="settings_word_color">Цвет слова</string>
+    <string name="settings_word_color_summary">Цвет левой и правой частей слова</string>
+    <string name="center_color_concr_summary">Цвет центральной буквы слова</string>
 </resources>

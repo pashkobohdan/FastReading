@@ -1,40 +1,40 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="Skin">
+    <PreferenceCategory android:title="@string/settings_skin">
 
 
         <SwitchPreference
             android:defaultValue="false"
             android:key="hide_status_bar"
-            android:summary="Clean reading place.\nBut you'll need click twice to stop reading (first to show status bar and second to pause)"
-            android:title="Hide status bar for reading" />
+            android:summary="@string/settings_hide_bar_summary"
+            android:title="@string/settings_hide_bar" />
 
         <com.jrummyapps.android.colorpicker.ColorPreference
             android:defaultValue="@color/white"
             android:key="background_color"
-            android:summary="Color of reading place (background)"
-            android:title="Background color"
+            android:summary="@string/settings_back_color_summary"
+            android:title="@string/settings_back_color"
             app:colorShape="circle" />
 
 
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Boundary lines">
+    <PreferenceCategory android:title="@string/settings_boundary">
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="boundary_lines"
-            android:summary="For better focusing on word"
-            android:title="Enable boundary lines" />
+            android:summary="@string/settings_enable_boundary_summary"
+            android:title="@string/settings_enable_boundary_lines" />
 
         <com.jrummyapps.android.colorpicker.ColorPreference
             android:defaultValue="@color/boundary_lines_color_default"
             android:dependency="boundary_lines"
             android:key="boundary_lines_color"
-            android:summary="Color of boundary lines (if you don't need this lines - turn off them)"
-            android:title="Boundary lines color"
+            android:summary="@string/settings_boundary_color_summary"
+            android:title="@string/settings_boundary_color"
             app:colorShape="circle" />
 
         <ListPreference
@@ -45,12 +45,12 @@
             android:key="boundary_lines_thickness"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
-            android:title="Thickness of the boundary lines" />
+            android:title="@string/settings_boundary_thickness" />
 
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Text">
+    <PreferenceCategory android:title="@string/settings_text">
 
         <ListPreference
             android:defaultValue="20"
@@ -59,27 +59,27 @@
             android:key="text_size"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
-            android:title="Text size" />
+            android:title="@string/settings_text_size" />
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="another_center_color"
-            android:summary="Set enable to choose color of center letter"
-            android:title="Another color of center letter of word" />
+            android:summary="@string/settings_center_color_summary"
+            android:title="@string/settings_another_center_color" />
 
         <com.jrummyapps.android.colorpicker.ColorPreference
             android:defaultValue="@color/center_letter_color_default"
             android:dependency="another_center_color"
             android:key="center_letter_color"
-            android:summary="Color of center part of word"
-            android:title="Center letter color"
+            android:summary="@string/center_color_concr_summary"
+            android:title="@string/settings_center_color"
             app:colorShape="circle" />
 
         <com.jrummyapps.android.colorpicker.ColorPreference
             android:defaultValue="@color/word_color_default"
             android:key="word_color"
-            android:summary="Color of left and right part of word"
-            android:title="Word color"
+            android:summary="@string/settings_word_color_summary"
+            android:title="@string/settings_word_color"
             app:colorShape="circle" />
 
     </PreferenceCategory>

@@ -129,4 +129,24 @@
     <string name="open_book_fab">Open PDF, FB2 or TXT file</string>
     <string name="download_fab">Download from cloud</string>
     <string name="create_book_fab">Create new book</string>
+
+    <string name="settings_skin">Skin</string>
+    <string name="settings_hide_bar">Hide status bar for reading</string>
+    <string name="settings_back_color">Background color</string>
+    <string name="settings_enable_boundary_lines">Enable boundary lines</string>
+    <string name="settings_boundary">Boundary lines</string>
+    <string name="settings_boundary_color">Boundary lines color</string>
+    <string name="settings_boundary_thickness">Thickness of the boundary lines</string>
+    <string name="settings_text">Text</string>
+    <string name="settings_text_size">Text size</string>
+    <string name="settings_another_center_color">Another color of center letter of word</string>
+    <string name="settings_center_color">Center letter color</string>
+    <string name="settings_word_color">Word color</string>
+    <string name="settings_enable_boundary_summary">For better focusing on word</string>
+    <string name="settings_boundary_color_summary">Color of boundary lines (if you don\'t need this lines - turn off them)</string>
+    <string name="settings_hide_bar_summary">Clean reading place</string>
+    <string name="settings_back_color_summary">Color of reading place (background)</string>
+    <string name="settings_center_color_summary">Set enable to choose color of center letter</string>
+    <string name="center_color_concr_summary">Color of center part of word</string>
+    <string name="settings_word_color_summary">Color of left and right part of word</string>
 </resources>

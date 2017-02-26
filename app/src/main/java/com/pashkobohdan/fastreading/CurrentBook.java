@@ -48,7 +48,7 @@ public class CurrentBook extends AppCompatActivity {
     public static final int RESTART_TIMER_TASK_ONLINE = -1;
     public static final int SPEED_CHANGE_STEP = 20;
     public static final int SPEED_MIN_VALUE = 20;
-    public static final int SPEED_MAX_VALUE = 1500;
+    public static final int SPEED_MAX_VALUE = 2000;
     public static final int REWIND_WORD_DELAY = 100;
     public static final int NANOSECONDS_IN_ONE_SECOND = 1000 * 1000 * 1000;
     public static final double MILLISECONDS_IN_ONE_MINUTE = 60000.0;
