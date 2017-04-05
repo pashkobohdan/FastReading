@@ -1,6 +1,14 @@
-# Project Title
+# Fast Reading
 
 New way of reading any texts. Just try and read up to 2k words/minute
+
+## Screenshots
+<img alt="Main screen:" align="right" height="300"
+   src="https://raw.githubusercontent.com/pashkobohdan/FastReading/master/screenshots/1.png" />
+<img alt="Nothing but reading" align="right" height="300"
+   src="https://raw.githubusercontent.com/pashkobohdan/FastReading/master/screenshots/3.png" />
+<img alt="Customize reading" align="right" height="300"
+   src="https://raw.githubusercontent.com/pashkobohdan/FastReading/master/screenshots/4.png" />
 
 ## Getting Started
 
