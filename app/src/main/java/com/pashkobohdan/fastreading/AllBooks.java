@@ -4,11 +4,15 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -61,6 +65,8 @@ import static com.pashkobohdan.fastreading.library.fileSystem.file.InternalStora
 public class AllBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener, GoogleApiClient.OnConnectionFailedListener {
     private static final int PERMISSION_REQUEST_CODE = 1;
     private static final int RC_SIGN_IN = 9001;
+
+    public static final int OPEN_PDF_FB2_TXT_FILE = 999;
 
     /**
      * UI elements
@@ -139,8 +145,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("first_start", true)) {
             BookInfo firstBook = BookInfoFactory.createNewInstance(new BookReadingResult(getResources().getString(R.string.first_book_text), getResources().getString(R.string.first_book_name), getResources().getString(R.string.first_book_author)), this);
-            if(firstBook == null){
-                EmailCrashReport.sendCrashReport(this, new Exception("Cannot create first book. Device : "+System.getProperties().toString()));
+            if (firstBook == null) {
+                EmailCrashReport.sendCrashReport(this, new Exception("Cannot create first book. Device : " + System.getProperties().toString()));
             }
 
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("first_start", false).apply();
@@ -359,6 +365,19 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 twoStageRate.showRatePromptDialog();
                 break;
 
+            case R.id.else_by_bsapps:
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pub:B+S+Apps")));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/developer?id=B+S+Apps")));
+                }
+                break;
+
+            case R.id.show_help:
+                startActivity(new Intent(this, WelcomeActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                break;
+
 
         }
 
@@ -401,6 +420,30 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             } else {
                 Toast.makeText(AllBooks.this, R.string.sign_in_error, Toast.LENGTH_SHORT).show();
                 signInSuccess = null;
+            }
+        } else if (requestCode == OPEN_PDF_FB2_TXT_FILE) {
+            if (resultCode == RESULT_OK) {
+                File myFile = new File(getRealPathFromURI(data.getData()));
+
+                if (myFile.getAbsolutePath().endsWith("pdf") ||
+                        myFile.getAbsolutePath().endsWith("fb2") ||
+                        myFile.getAbsolutePath().endsWith("txt")) {
+
+                    selectOpeningFile(myFile);
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.information)
+                            .setMessage(R.string.choose_cerrect_file)
+                            .create()
+                            .show();
+                }
+
+            } else {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.information)
+                        .setMessage(R.string.choose_cerrect_file)
+                        .create()
+                        .show();
             }
         }
     }
@@ -614,15 +657,52 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     }
 
     private void openFileChooserDialog() {
-        FileChooserDialog.Builder builder =
-                new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, this)
-                        .setTitle(getString(R.string.select_file_dialog_title))
-                        .setFileFormats(new String[]{".txt", ".pdf", ".fb2"});
-        try {
-            builder.build().show(getSupportFragmentManager(), null);
-        } catch (ExternalStorageNotAvailableException e) {
-            e.printStackTrace();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.chooe_file_manager)
+                .setTitle(R.string.open_file)
+                .setPositiveButton(R.string.default_file_manager, (dialog, which) -> {
+                    FileChooserDialog.Builder openFileBuilder =
+                            new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, this)
+                                    .setTitle(getString(R.string.select_file_dialog_title))
+                                    .setFileFormats(new String[]{".txt", ".pdf", ".fb2"});
+                    try {
+                        openFileBuilder.build().show(getSupportFragmentManager(), null);
+                    } catch (ExternalStorageNotAvailableException e) {
+                        e.printStackTrace();
+                    }
+                })
+                .setNegativeButton(R.string.system_file_manager, (dialog, which) -> {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.setType("file/*");
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                        try {
+                            startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pdf_fb2_txt_files)), OPEN_PDF_FB2_TXT_FILE);
+                        } catch (ActivityNotFoundException e) {
+                            throw e;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                })
+                .show();
+
+
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
         }
+        return result;
     }
 
     private void selectOpeningFile(File inputFile) {

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Fast Reading</string>
     <string name="action_settings">Настройки</string>
     <string name="activity_my_books_title">Все книги</string>
     <string name="auth_error">Ошибка аутентификации</string>
@@ -115,4 +114,17 @@
     <string name="settings_word_color">Цвет слова</string>
     <string name="settings_word_color_summary">Цвет левой и правой частей слова</string>
     <string name="center_color_concr_summary">Цвет центральной буквы слова</string>
+
+    <string name="default_file_manager">Стандартный менеджер</string>
+    <string name="open_file">Открыть файл</string>
+    <string name="system_file_manager">Системный менеджер</string>
+    <string name="this_function_available_in_pro_version">Функция доступна в Про версии</string>
+    <string name="you_spent_words">Вы потратили все слова</string>
+    <string name="else_by_b_s_apps">Еще от  \'B S Apps\'</string>
+    <string name="help">Помощь</string>
+    <string name="select_pdf_fb2_txt_files">Выберите PDF, FB2 или TXT файл</string>
+    <string name="choose_cerrect_file">Пожалуйста, выберите корректный файл</string>
+    <string name="chooe_file_manager">Выберите файловый менеджер</string>
+    <string name="buy_pro_version">Купить Про версию</string>
+    <string name="read_up_to_2k_pro">Вы можете читать до 2000 слов в минуту в Про версии</string>
 </resources>

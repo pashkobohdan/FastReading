@@ -68,6 +68,19 @@
 
 
 
+    <item
+        android:id="@+id/else_by_bsapps"
+        android:orderInCategory="100"
+        android:title="@string/else_by_b_s_apps"
+        app:showAsAction="ifRoom" />
+
+
+
+    <item
+        android:id="@+id/show_help"
+        android:orderInCategory="100"
+        android:title="@string/help"
+        app:showAsAction="ifRoom" />
     <!--<item-->
         <!--android:id="@+id/action_help"-->
         <!--android:orderInCategory="100"-->
