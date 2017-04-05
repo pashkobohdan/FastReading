@@ -12,7 +12,7 @@ New way of reading any texts. Just try and read up to 2k words/minute
 
 ## Getting Started
 
-* [Pro version](https://play.google.com/store/apps/details?id=com.pashkobohdan.fastreading) or [Free version](https://play.google.com/store/apps/details?id=com.pashkobohdan.fastreadinglite) in Google Play
+* [Free version](https://play.google.com/store/apps/details?id=com.pashkobohdan.fastreadinglite) in Google Play
 * Clone project and import into AndroidStudio
 ```
 git clone https://github.com/pashkobohdan/FastReading.git
