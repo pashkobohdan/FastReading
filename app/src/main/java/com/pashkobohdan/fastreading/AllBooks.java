@@ -169,7 +169,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         twoStageRate
                 .setInstallDays(3)
                 .setLaunchTimes(5)
-                .setEventsTimes(3)
+                .setEventsTimes(5)
                 .setFeedbackReceivedListener(feedback -> Toast.makeText(AllBooks.this, feedback, Toast.LENGTH_SHORT).show());
 
         twoStageRate.setRatePromptTitle(getString(R.string.rate_prompt_title)).
@@ -177,6 +177,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 resetOnDismiss(true).
                 resetOnFeedBackDeclined(true).
                 resetOnRatingDeclined(true)
+
                 .setShowAppIcon(false);
 
         twoStageRate.setConfirmRateDialogTitle(getString(R.string.confirm_rate_title)).
