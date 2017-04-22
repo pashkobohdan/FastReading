@@ -25,10 +25,10 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:gravity="center"
                 android:id="@+id/current_book_progress"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:gravity="center" />
         </LinearLayout>
 
 
@@ -107,15 +107,14 @@
 
 
             <TextView
-                android:visibility="gone"
-                android:gravity="center"
-                android:layout_alignParentBottom="true"
+                android:id="@+id/current_book_online_new_speed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/current_book_online_new_speed"/>
+                android:layout_alignParentBottom="true"
+                android:gravity="center" />
 
+            <!--android:visibility="gone"-->
         </RelativeLayout>
-
 
 
         <LinearLayout
@@ -124,6 +123,20 @@
             android:layout_height="60dp"
             android:background="@color/colorPrimary"
             android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/current_book_speed_minus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/speed_down_button"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -155,12 +168,12 @@
             </RelativeLayout>
 
 
-            <TextView
-                android:id="@+id/current_book_current_speed"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textColor="@color/white" />
+            <!--<TextView-->
+                <!--android:id="@+id/current_book_current_speed"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:gravity="center"-->
+                <!--android:textColor="@color/white" />-->
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -191,6 +204,19 @@
                     android:textColor="@color/white" />
             </RelativeLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/current_book_speed_plus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/speed_up_button"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
         </LinearLayout>
 
     </LinearLayout>

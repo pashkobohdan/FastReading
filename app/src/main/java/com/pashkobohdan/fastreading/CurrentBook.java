@@ -50,6 +50,7 @@ public class CurrentBook extends AppCompatActivity {
     public static final int SPEED_MIN_VALUE = 20;
     public static final int SPEED_MAX_VALUE = 2000;
     public static final int REWIND_WORD_DELAY = 100;
+    public static final int SPEED_CHANGING_DELAY = 50;
     public static final int NANOSECONDS_IN_ONE_SECOND = 1000 * 1000 * 1000;
     public static final double MILLISECONDS_IN_ONE_MINUTE = 60000.0;
 
@@ -68,10 +69,11 @@ public class CurrentBook extends AppCompatActivity {
 
     private RelativeLayout readingPanel;
     private TextView topBoundaryLine, bottomBoundaryLine;
-    private TextView currentWordLeftPart, currentWordCenterPart, currentWordRightPart, currentSpeed;
+    private TextView currentWordLeftPart, currentWordCenterPart, currentWordRightPart;
+    //private TextView currentSpeed;
     private TextView newSpeedOnPlaying;
 
-    private ImageButton positionForwardBack, positionBack, positionUp, positionForwardUp;
+    private ImageButton positionForwardBack, positionBack, positionUp, positionForwardUp, speedPlus, speedMinus;
 
     /**
      * Reading help objects
@@ -165,11 +167,14 @@ public class CurrentBook extends AppCompatActivity {
         currentWordLeftPart = (TextView) findViewById(R.id.current_book_left_part);
         currentWordCenterPart = (TextView) findViewById(R.id.current_book_center_part);
         currentWordRightPart = (TextView) findViewById(R.id.current_book_right_part);
-        currentSpeed = (TextView) findViewById(R.id.current_book_current_speed);
+        //currentSpeed = (TextView) findViewById(R.id.current_book_current_speed);
         positionForwardBack = (ImageButton) findViewById(R.id.current_book_speed_forward_back);
         positionBack = (ImageButton) findViewById(R.id.current_book_speed_back);
         positionUp = (ImageButton) findViewById(R.id.current_book_speed_up);
         positionForwardUp = (ImageButton) findViewById(R.id.current_book_speed_forward_up);
+
+        speedPlus = (ImageButton) findViewById(R.id.current_book_speed_plus);
+        speedMinus = (ImageButton) findViewById(R.id.current_book_speed_minus);
 
         topBoundaryLine = (TextView) findViewById(R.id.current_book_top_boundary_line);
         bottomBoundaryLine = (TextView) findViewById(R.id.current_book_bottom_boundary_line);
@@ -303,55 +308,65 @@ public class CurrentBook extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void speedMinus() {
+        bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() > SPEED_MIN_VALUE ?
+                bookInfo.getCurrentSpeed() - SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
+        //currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
+
+        if (currentReadingStatus == ReadingStatus.STATUS_PLAYING) {
+            speedChangingWhenReading = true;
+            lastUserChangingReading = System.nanoTime();
+
+            newSpeedOnPlaying.setVisibility(View.VISIBLE);
+            newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
+            new Handler().postDelayed(() -> {
+                if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
+                    newSpeedOnPlaying.setVisibility(View.GONE);
+                    speedChangingWhenReading = false;
+                }
+
+            }, 1000);
+
+            startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
+        } else {
+            newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
+        }
+    }
+
+    private void speedPlus() {
+        bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() < SPEED_MAX_VALUE ?
+                bookInfo.getCurrentSpeed() + SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
+        //currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
+
+        if (currentReadingStatus == ReadingStatus.STATUS_PLAYING) {
+            speedChangingWhenReading = true;
+            lastUserChangingReading = System.nanoTime();
+
+            newSpeedOnPlaying.setVisibility(View.VISIBLE);
+            newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
+            new Handler().postDelayed(() -> {
+                if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
+                    newSpeedOnPlaying.setVisibility(View.GONE);
+                    speedChangingWhenReading = false;
+                }
+
+            }, 1000);
+
+            startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
+        } else {
+            newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
+        }
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KEYCODE_VOLUME_DOWN:
-                bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() > SPEED_MIN_VALUE ?
-                        bookInfo.getCurrentSpeed() - SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
-                currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
-
-                if (currentReadingStatus == ReadingStatus.STATUS_PLAYING) {
-                    speedChangingWhenReading = true;
-                    lastUserChangingReading = System.nanoTime();
-
-                    newSpeedOnPlaying.setVisibility(View.VISIBLE);
-                    newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
-                    new Handler().postDelayed(() -> {
-                        if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
-                            newSpeedOnPlaying.setVisibility(View.GONE);
-                            speedChangingWhenReading = false;
-                        }
-
-                    }, 1000);
-
-                    startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
-                }
-
+                speedMinus();
                 return true;
 
             case KEYCODE_VOLUME_UP:
-                bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() < SPEED_MAX_VALUE ?
-                        bookInfo.getCurrentSpeed() + SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
-                currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
-
-                if (currentReadingStatus == ReadingStatus.STATUS_PLAYING) {
-                    speedChangingWhenReading = true;
-                    lastUserChangingReading = System.nanoTime();
-
-                    newSpeedOnPlaying.setVisibility(View.VISIBLE);
-                    newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
-                    new Handler().postDelayed(() -> {
-                        if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
-                            newSpeedOnPlaying.setVisibility(View.GONE);
-                            speedChangingWhenReading = false;
-                        }
-
-                    }, 1000);
-
-                    startOfRestartPlaying(RESTART_TIMER_TASK_ONLINE);
-                }
-
+                speedPlus();
                 return true;
 
             case KEYCODE_BACK:
@@ -397,7 +412,8 @@ public class CurrentBook extends AppCompatActivity {
 
         setReadingPosition(bookInfo.getCurrentWordNumber());
 
-        currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
+        //currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
+        newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
     }
 
     private void initializeListeners() {
@@ -438,9 +454,9 @@ public class CurrentBook extends AppCompatActivity {
         ButtonContinuesClickAction.setContinuesClickAction(positionBack,
                 () -> setReadingPosition(getReadingPosition() == 0 ? 0 : getReadingPosition() - 1), REWIND_WORD_DELAY);
 
-        ButtonContinuesClickAction.setContinuesClickAction(positionUp, () ->
-                setReadingPosition(getReadingPosition() ==
-                        bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : getReadingPosition() + 1), REWIND_WORD_DELAY);
+        ButtonContinuesClickAction.setContinuesClickAction(positionUp,
+                () -> setReadingPosition(getReadingPosition() == bookInfo.getWords().length - 1 ?
+                        bookInfo.getWords().length - 1 : getReadingPosition() + 1), REWIND_WORD_DELAY);
 
         ButtonContinuesClickAction.setContinuesClickAction(positionForwardUp, () -> {
             int position;
@@ -455,6 +471,14 @@ public class CurrentBook extends AppCompatActivity {
 
             setReadingPosition(position >= bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : position + 1);
         }, REWIND_WORD_DELAY);
+
+
+        ButtonContinuesClickAction.setContinuesClickAction(speedPlus, ()-> {
+            speedPlus();
+        }, SPEED_CHANGING_DELAY);
+
+        ButtonContinuesClickAction.setContinuesClickAction(speedMinus, this::speedMinus, SPEED_CHANGING_DELAY);
+
 
         currentPositionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -528,6 +552,8 @@ public class CurrentBook extends AppCompatActivity {
 
         switch (currentReadingStatus) {
             case STATUS_PAUSE:
+                newSpeedOnPlaying.setVisibility(View.VISIBLE);
+
                 appBarLayout.setVisibility(View.VISIBLE);
                 topManagePanel.setVisibility(View.VISIBLE);
                 bottomManagePanel.setVisibility(View.VISIBLE);
@@ -535,6 +561,8 @@ public class CurrentBook extends AppCompatActivity {
                 stopPlaying();
                 break;
             case STATUS_PLAYING:
+                newSpeedOnPlaying.setVisibility(View.GONE);
+
                 appBarLayout.setVisibility(View.GONE);
                 topManagePanel.setVisibility(View.GONE);
                 bottomManagePanel.setVisibility(View.GONE);

@@ -28,9 +28,9 @@
         <activity
             android:name=".Download"
             android:label="@string/download_activity_title" />
-
-        <activity android:name=".WelcomeActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".WelcomeActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
