@@ -125,7 +125,7 @@
     <string name="sort_by_name">Sort by name</string>
     <string name="sort_by_author">Sort by author</string>
     <string name="rate_this_app">Rate this app</string>
-    <string name="open_book_fab">Open PDF, FB2 or TXT file</string>
+    <string name="open_book_fab">Open PDF, FB2, EPUB or TXT file</string>
     <string name="download_fab">Download from cloud</string>
     <string name="create_book_fab">Create new book</string>
 

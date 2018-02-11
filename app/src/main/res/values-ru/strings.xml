@@ -92,7 +92,7 @@
     <string name="sort_by_progress">Сортировать по прогрессу</string>
     <string name="to_start">Начать сначала</string>
     <string name="rate_this_app">Оценить это приложение</string>
-    <string name="open_book_fab">Открыть PDF, FB2 или TXT книгу</string>
+    <string name="open_book_fab">Открыть PDF, FB2, EPUB или TXT книгу</string>
     <string name="create_book_fab">Создать книгу</string>
     <string name="download_fab">Скачать книгу с хранилища</string>
     <string name="settings_another_center_color">Другой цвет для центральной буквы</string>

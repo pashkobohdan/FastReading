@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@mipmap/tts" android:state_pressed="false">
+
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorPrimary" />
+
+            <stroke android:color="@color/white" />
+
+        </shape>
+
+        <!--<bitmap android:src="@drawable/ic_file"/>-->
+
+
+    </item>
+    <item android:state_selected="true"
+
+        android:drawable="@mipmap/tts_selected">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorPrimary" />
+            <!--<stroke-->
+            <!--android:width="1dp"-->
+            <!--android:color="#ffffff" />-->
+
+        </shape>
+    </item>
+    <item android:state_pressed="true" android:drawable="@mipmap/tts_selected">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorPrimary" />
+            <!--<stroke-->
+            <!--android:width="1dp"-->
+            <!--android:color="#ffffff" />-->
+
+        </shape>
+    </item>
+</selector>

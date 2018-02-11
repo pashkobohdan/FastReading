@@ -2,6 +2,7 @@
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_my_books"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -40,6 +41,7 @@
 
 
             <LinearLayout
+                android:id="@+id/text_one_line_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -105,15 +107,33 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:id="@+id/tts_text_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_margin="16dp"
+                    android:textColor="@color/black"
+                    tools:text="Text of current sentence tts spech. This text can be multiline and as long as need"
+                    android:id="@+id/tts_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
             <TextView
+                android:layout_margin="5dp"
                 android:id="@+id/current_book_online_new_speed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:gravity="center" />
+                android:gravity="center"
+                android:textSize="18sp" />
 
-            <!--android:visibility="gone"-->
         </RelativeLayout>
 
 
@@ -168,6 +188,21 @@
             </RelativeLayout>
 
 
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/current_book_tts_on"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@android:color/transparent"
+                    android:src="@mipmap/tts"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
             <!--<TextView-->
                 <!--android:id="@+id/current_book_current_speed"-->
                 <!--android:layout_width="wrap_content"-->

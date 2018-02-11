@@ -4,11 +4,15 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,22 +33,20 @@ import com.pashkobohdan.fastreading.library.ui.button.ButtonContinuesClickAction
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.os.Handler;
-import android.widget.Toast;
-
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 import static android.view.KeyEvent.KEYCODE_VOLUME_DOWN;
 import static android.view.KeyEvent.KEYCODE_VOLUME_UP;
+import static android.view.View.VISIBLE;
 
-public class CurrentBook extends AppCompatActivity {
+public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnInitListener {
     public static final String BOOK_INFO_EXTRA_NAME = "serializable_book_file";
     public static final double TIME_DELTA_LONG_WORDS = 1.5;
-    public static final double TIME_DELTA_DOT = 1.5;
-    public static final double TIME_DELTA_COMA = 1.3;
+    public static final double TIME_DELTA_DOT = 2.0;//1.5;
+    public static final double TIME_DELTA_COMA = 1.5;//1.3;
     public static final int RESTART_TIMER_TASK_ONLINE = -1;
     public static final int SPEED_CHANGE_STEP = 20;
     public static final int SPEED_MIN_VALUE = 20;
@@ -53,6 +55,8 @@ public class CurrentBook extends AppCompatActivity {
     public static final int SPEED_CHANGING_DELAY = 50;
     public static final int NANOSECONDS_IN_ONE_SECOND = 1000 * 1000 * 1000;
     public static final double MILLISECONDS_IN_ONE_MINUTE = 60000.0;
+
+    private static final float DIVIDE_TTS_SPEECH_RATE_BY = 120.0f;
 
     /**
      * Main object (activity works with it)
@@ -74,6 +78,16 @@ public class CurrentBook extends AppCompatActivity {
     private TextView newSpeedOnPlaying;
 
     private ImageButton positionForwardBack, positionBack, positionUp, positionForwardUp, speedPlus, speedMinus;
+
+
+    private LinearLayout oneLineTextContainer;
+    private LinearLayout ttsTextContainer;
+    private TextView ttsTextTextView;
+
+    private TextToSpeech mTTS;
+    private boolean isTtsTurnedOn;
+
+    private AppCompatImageButton ttsTurnOnButton;
 
     /**
      * Reading help objects
@@ -137,6 +151,10 @@ public class CurrentBook extends AppCompatActivity {
         }
 
 
+        mTTS = new TextToSpeech(this, this);
+        mTTS.setOnUtteranceCompletedListener(utteranceId -> runOnUiThread(() -> nextTtsSentence()));
+
+
         /**
          *  Here's all right ! (if we're here)
          */
@@ -155,12 +173,40 @@ public class CurrentBook extends AppCompatActivity {
         refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
 
+
+    @Override
+    public void onInit(int status) {
+// TODO Auto-generated method stub
+        if (status == TextToSpeech.SUCCESS) {
+
+//            Locale locale = new Locale("ru");
+
+//            int result = mTTS.setLanguage(locale);
+//            //int result = mTTS.setLanguage(Locale.getDefault());
+//
+//            if (result == TextToSpeech.LANG_MISSING_DATA
+//                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+//                Log.e("TTS", "Извините, этот язык не поддерживается");
+//            } else {
+//                mButton.setEnabled(true);
+//            }
+
+        } else {
+            Log.e("TTS", "Ошибка!");
+        }
+    }
+
     private void findUiElements() {
         appBarLayout = (AppBarLayout) findViewById(R.id.current_book_app_bar_layout);
 
         topManagePanel = (LinearLayout) findViewById(R.id.current_book_top_manage_panel);
         bottomManagePanel = (LinearLayout) findViewById(R.id.current_book_bottom_manage_panel);
         readingPanel = (RelativeLayout) findViewById(R.id.current_book_reading_space);
+
+        oneLineTextContainer = (LinearLayout) findViewById(R.id.text_one_line_container);
+        ttsTextContainer = (LinearLayout) findViewById(R.id.tts_text_container);
+        ttsTextTextView = (TextView) findViewById(R.id.tts_text);
+        ttsTurnOnButton = (AppCompatImageButton) findViewById(R.id.current_book_tts_on);
 
         currentPositionSeekBar = (SeekBar) findViewById(R.id.current_book_current_position_seek_bar);
         currentBookProgress = (TextView) findViewById(R.id.current_book_progress);
@@ -181,6 +227,57 @@ public class CurrentBook extends AppCompatActivity {
 
         newSpeedOnPlaying = (TextView) findViewById(R.id.current_book_online_new_speed);
         newSpeedOnPlaying.setVisibility(View.GONE);
+
+        ttsTurnOnButton.setOnClickListener(v -> {
+            isTtsTurnedOn = !isTtsTurnedOn;
+
+            oneLineTextContainer.setVisibility(isTtsTurnedOn ? View.GONE : VISIBLE);
+            ttsTextContainer.setVisibility(isTtsTurnedOn ? VISIBLE : View.GONE);
+
+            if (!isTtsTurnedOn) {
+                if (mTTS != null && mTTS.isSpeaking()) {
+                    mTTS.stop();
+                }
+                ttsTurnOnButton.setImageResource(R.mipmap.tts);
+            } else {
+                nextTtsSentence();
+                ttsTurnOnButton.setImageResource(R.mipmap.tts_selected);
+            }
+
+            ttsTurnOnButton.setSelected(isTtsTurnedOn);
+        });
+    }
+
+    private void nextTtsSentence() {
+        if(isTtsTurnedOn) {
+            if (getReadingPosition() < words.size() - 1) {
+
+                StringBuilder nextSentence = new StringBuilder();
+                int position;
+                for (position = readingPosition; position < bookInfo.getWords().length; position++) {
+                    nextSentence.append(bookInfo.getWords()[position]);
+                    nextSentence.append(" ");
+                    if (bookInfo.getWords()[position].endsWith(".") ||
+                            bookInfo.getWords()[position].endsWith("?") ||
+                            bookInfo.getWords()[position].endsWith("!")) {
+                        setReadingPosition(position + 1);
+                        break;
+                    }
+                }
+                String nextSentenceString = new String(nextSentence);
+
+                ttsTextTextView.setText(nextSentenceString);
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "stringId");
+
+                mTTS.setSpeechRate(bookInfo.getCurrentSpeed() / DIVIDE_TTS_SPEECH_RATE_BY);
+                mTTS.speak(nextSentenceString, TextToSpeech.QUEUE_FLUSH, params);
+
+            } else {
+                showBookEndDialog();
+            }
+        }
     }
 
     @Override
@@ -216,8 +313,8 @@ public class CurrentBook extends AppCompatActivity {
         }
 
         if (showBoundaryLines) {
-            topBoundaryLine.setVisibility(View.VISIBLE);
-            bottomBoundaryLine.setVisibility(View.VISIBLE);
+            topBoundaryLine.setVisibility(VISIBLE);
+            bottomBoundaryLine.setVisibility(VISIBLE);
 
 
             ViewGroup.LayoutParams params = topBoundaryLine.getLayoutParams();
@@ -248,6 +345,7 @@ public class CurrentBook extends AppCompatActivity {
         currentWordLeftPart.setTextSize(textSize);
         currentWordCenterPart.setTextSize(textSize);
         currentWordRightPart.setTextSize(textSize);
+        ttsTextTextView.setTextSize(textSize);
     }
 
     @Override
@@ -268,6 +366,12 @@ public class CurrentBook extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        // Don't forget to shutdown mTTS!
+        if (mTTS != null) {
+            mTTS.stop();
+            mTTS.shutdown();
+        }
+
         super.onDestroy();
 
         bookInfo.setCurrentWordNumber(readingPosition);
@@ -317,7 +421,7 @@ public class CurrentBook extends AppCompatActivity {
             speedChangingWhenReading = true;
             lastUserChangingReading = System.nanoTime();
 
-            newSpeedOnPlaying.setVisibility(View.VISIBLE);
+            newSpeedOnPlaying.setVisibility(VISIBLE);
             newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
             new Handler().postDelayed(() -> {
                 if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
@@ -342,7 +446,7 @@ public class CurrentBook extends AppCompatActivity {
             speedChangingWhenReading = true;
             lastUserChangingReading = System.nanoTime();
 
-            newSpeedOnPlaying.setVisibility(View.VISIBLE);
+            newSpeedOnPlaying.setVisibility(VISIBLE);
             newSpeedOnPlaying.setText(getResources().getString(R.string.speed) + " : " + bookInfo.getCurrentSpeed());
             new Handler().postDelayed(() -> {
                 if (System.nanoTime() - lastUserChangingReading > NANOSECONDS_IN_ONE_SECOND) {
@@ -427,6 +531,9 @@ public class CurrentBook extends AppCompatActivity {
 
 
         readingPanel.setOnClickListener(v -> {
+            if(isTtsTurnedOn) {
+                return;
+            }
             if (currentReadingStatus == ReadingStatus.STATUS_PAUSE) {
                 if (hideStatusBarForReading) {
                     hideSystemUI();
@@ -448,7 +555,11 @@ public class CurrentBook extends AppCompatActivity {
                 }
             }
 
+            if(mTTS != null && mTTS.isSpeaking()) {
+                mTTS.stop();
+            }
             setReadingPosition(position <= 0 ? 0 : position + 1);
+            nextTtsSentence();
         }, REWIND_WORD_DELAY);
 
         ButtonContinuesClickAction.setContinuesClickAction(positionBack,
@@ -469,13 +580,15 @@ public class CurrentBook extends AppCompatActivity {
                 }
             }
 
+            if(mTTS != null && mTTS.isSpeaking()) {
+                mTTS.stop();
+            }
             setReadingPosition(position >= bookInfo.getWords().length - 1 ? bookInfo.getWords().length - 1 : position + 1);
+            nextTtsSentence();
         }, REWIND_WORD_DELAY);
 
 
-        ButtonContinuesClickAction.setContinuesClickAction(speedPlus, ()-> {
-            speedPlus();
-        }, SPEED_CHANGING_DELAY);
+        ButtonContinuesClickAction.setContinuesClickAction(speedPlus, this::speedPlus, SPEED_CHANGING_DELAY);
 
         ButtonContinuesClickAction.setContinuesClickAction(speedMinus, this::speedMinus, SPEED_CHANGING_DELAY);
 
@@ -552,11 +665,11 @@ public class CurrentBook extends AppCompatActivity {
 
         switch (currentReadingStatus) {
             case STATUS_PAUSE:
-                newSpeedOnPlaying.setVisibility(View.VISIBLE);
+                newSpeedOnPlaying.setVisibility(VISIBLE);
 
-                appBarLayout.setVisibility(View.VISIBLE);
-                topManagePanel.setVisibility(View.VISIBLE);
-                bottomManagePanel.setVisibility(View.VISIBLE);
+                appBarLayout.setVisibility(VISIBLE);
+                topManagePanel.setVisibility(VISIBLE);
+                bottomManagePanel.setVisibility(VISIBLE);
 
                 stopPlaying();
                 break;
@@ -596,6 +709,9 @@ public class CurrentBook extends AppCompatActivity {
         if (timer != null) {
             timer.cancel();
             timer = null;
+        }
+        if(mTTS != null && mTTS.isSpeaking()) {
+            mTTS.stop();
         }
     }
 

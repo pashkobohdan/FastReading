@@ -62,7 +62,8 @@ import ir.sohreco.androidfilechooser.FileChooserDialog;
 import static com.pashkobohdan.fastreading.CurrentBook.BOOK_INFO_EXTRA_NAME;
 import static com.pashkobohdan.fastreading.library.fileSystem.file.InternalStorageFileHelper.INTERNAL_FILE_EXTENSION;
 
-public class AllBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener, GoogleApiClient.OnConnectionFailedListener {
+public class AllBooks extends AppCompatActivity implements FileChooserDialog.ChooserListener,
+        GoogleApiClient.OnConnectionFailedListener {
     private static final int PERMISSION_REQUEST_CODE = 1;
     private static final int RC_SIGN_IN = 9001;
 
@@ -167,13 +168,13 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
          */
         twoStageRate = TwoStageRate.with(this);
         twoStageRate
-                .setInstallDays(3)
-                .setLaunchTimes(5)
-                .setEventsTimes(5)
+                .setInstallDays(10)
+                .setLaunchTimes(15)
+                .setEventsTimes(20)
                 .setFeedbackReceivedListener(feedback -> Toast.makeText(AllBooks.this, feedback, Toast.LENGTH_SHORT).show());
 
         twoStageRate.setRatePromptTitle(getString(R.string.rate_prompt_title)).
-                setRatePromptDismissible(false).
+                setRatePromptDismissible(true).
                 resetOnDismiss(true).
                 resetOnFeedBackDeclined(true).
                 resetOnRatingDeclined(true)
@@ -665,7 +666,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                     FileChooserDialog.Builder openFileBuilder =
                             new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, this)
                                     .setTitle(getString(R.string.select_file_dialog_title))
-                                    .setFileFormats(new String[]{".txt", ".pdf", ".fb2"});
+                                    .setFileFormats(new String[]{".txt", ".pdf", ".fb2", ".epub"});
                     try {
                         openFileBuilder.build().show(getSupportFragmentManager(), null);
                     } catch (ExternalStorageNotAvailableException e) {

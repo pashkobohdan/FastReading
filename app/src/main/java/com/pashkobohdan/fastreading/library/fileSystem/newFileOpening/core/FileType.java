@@ -19,5 +19,10 @@ public enum FileType {
     /**
      * .fb2 file
      */
-    FB2_FILE
+    FB2_FILE,
+
+    /**
+     *
+     */
+    EPUB_FILE
 }

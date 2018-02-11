@@ -1,0 +1,165 @@
+<resources>
+    <string name="action_settings">Ajustes</string>
+    <string name="activity_my_books_title">Libros</string>
+    <string name="title_activity_settings">Ajustes</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_header_general">General</string>
+    <string name="pref_header_notifications">Notificaciones</string>
+    <string name="new_books_notifications">Notif. nuevos libros</string>
+    <string-array name="pref_text_size_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+        <item>35</item>
+        <item>40</item>
+        <item>45</item>
+        <item>50</item>
+        <item>55</item>
+        <item>60</item>
+        <item>65</item>
+        <item>70</item>
+        <item>75</item>
+        <item>80</item>
+    </string-array>
+
+    <string-array name="pref_boundary_lines_width_values">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+    </string-array>
+    <string name="pref_title_ringtone">Melodía</string>
+    <string name="pref_ringtone_silent">Silencio</string>
+    <string name="pref_title_vibrate">Vibración</string>
+
+
+
+    <string name="book_list_book_reading_error">error de lectura</string>
+
+    <string name="default_book_author">sin autor</string>
+    <string name="sign_in">Identificarse</string>
+    <string name="sign_out">Salir</string>
+    <string name="rate_prompt_title">¿Te gusta nuestra app?</string>
+    <string name="confirm_rate_title">¡Gracias!</string>
+    <string name="confirm_rate_description">¿Quieres dejar tu comentario en la app store? Esto nos ayuda y nos motiva mucho.</string>
+    <string name="confirm_rate_positive">Claro</string>
+    <string name="confirm_rate_negative">No, gracias</string>
+    <string name="feedback_title">Lo sentimos mucho</string>
+    <string name="feedback_description">¿Qué problema te has encontrado? Esto nos ayudará mucho.</string>
+    <string name="feedback_positive">Enviar</string>
+    <string name="feedback_negative">No, gracias</string>
+    <string name="send_crash_report_title">Enviar informe de errores</string>
+    <string name="send_crash_report_message">¿Quieres enviar un informe al desarrollador? Esto nos ayudará mucho.</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+    <string name="easy_book_opening">Apertura fácil</string>
+    <string name="books_management">Gestión de libros</string>
+    <string name="sorst_and_settings">Orden y ajustes</string>
+    <string name="easy_book_opening_text">Haz click en el botón para añadir un libro. Puedes abrirlo, crearlo o descargarlo.</string>
+    <string name="books_management_text">Desliza el libro a la izquierda para gestionarlo.</string>
+    <string name="sorst_and_settings_text">Elige el método de ordenación. Ves a ajustes y configura la lectura.</string>
+    <string name="easy_reading">Lectura fácil</string>
+    <string name="easy_reading_text">Haz click en cualquier sitio para iniciar/parar. Los botones de volumen cambian la velocidad.</string>
+    <string name="easy_management">Gestión fácil</string>
+    <string name="easy_management_text">Retrocede palabras y frases. Presión larga para retroceder más rápido.</string>
+    <string name="reading_settings">Ajustes de lectura</string>
+    <string name="reading_settings_text">Cancelar el último retroceso o volver a empezar.</string>
+
+    <string name="first_book_name">Primer libro. Hazme click</string>
+    <string name="first_book_author">sin autor</string>
+    <string name="first_book_text">Para empezar a leer simplemente haz click en cualquier sitio despejado. Cama cambiar la velocidad, usa los botones de volumen. Para gestionar el Libro, deslízalo a la izquierda. Para añadir nuevos Libros, haz click en el botón redondo.</string>
+    <string name="google_service_error">Error de Google Play Services</string>
+    <string name="download_activity_title">Libros en la nube</string>
+    <string name="email_client_not_found">No hay clientes de correo instalados</string>
+    <string name="sign_out_ok">¡Salida correcta!</string>
+    <string name="sign_in_error">La identificación en Google falló</string>
+    <string name="auth_error">Falló la identificación. Inténtalo más tarde</string>
+    <string name="sign_in_ok">¡Identificación correcta!</string>
+    <string name="dialog_book_upload_title">Subir libro</string>
+    <string name="dialog_book_upload_text">Puedes cerrar este mensaje, la subida continuará en segundo plano.</string>
+    <string name="book_upload_success">Subida de libro correcta</string>
+    <string name="delete_confirm_1">"¿Quieres eliminar este registro? : "</string>
+    <string name="information">Información</string>
+    <string name="book_is_empty">Este libro esta vacío. Prueba a borrarlo y abrirlo de nuevo.</string>
+    <string name="book_still_opening">El libro no se ha cargado aún. Espera un momento.</string>
+    <string name="select_file_dialog_title">Selecciona un fichero</string>
+    <string name="reading_dialog_title">Cargando</string>
+    <string name="reading_dialog_text">Por favor, espera mientras se carga el libro. Puedes usar otras apps mientras tanto.</string>
+    <string name="error">Error</string>
+    <string name="book_loading_error">Error al cargar el libro. Inténtalo más tarde.</string>
+    <string name="ok">OK</string>
+    <string name="speed">Velocidad</string>
+    <string name="book_end">Fin de libro</string>
+    <string name="book_end_dialog_text">¿Quieres empezar de nuevo?</string>
+    <string name="file_writing_error">Error guardando el fichero</string>
+    <string name="book_write_success">Libro guardado correctamente</string>
+    <string name="loading_books">Cargando libros</string>
+    <string name="loading_books_text">Puedes cerrar este diálogo, los datos se descargarán automáticamente.</string>
+    <string name="no_author">sin autor</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="editing_cancel_text">¿Quieres cancelar la edición de este libro?</string>
+    <string name="set_valid_data">Por favor, pon los datos válidos</string>
+    <string name="book_write_error">Error guardando el libro</string>
+    <string name="book_name_author_or_part_of_text">Título, autor o parte del texto</string>
+    <string name="book_s_name">Título</string>
+    <string name="book_s_author">Autor</string>
+    <string name="book_s_text">Texto</string>
+    <string name="edit">Editar</string>
+    <string name="share">Compartir</string>
+    <string name="upload">Subir</string>
+    <string name="delete">Borrar</string>
+    <string name="refreshing">actualizando…</string>
+    <string name="book_writing_error">Error guardando el libro</string>
+    <string name="book_rewriting_confirm">"¿Quieres reescribir este libro?"</string>
+    <string name="to_start">Al inicio</string>
+    <string name="cancel_last_rewind">Cancelar último retroceso</string>
+    <string name="sort_by_last_opening">Ordenar por última apertura</string>
+    <string name="sort_by_progress">Ordenar por progreso</string>
+    <string name="sort_by_name">Ordenar por nombre</string>
+    <string name="sort_by_author">Ordenar por autor</string>
+    <string name="rate_this_app">Valorar esta app</string>
+    <string name="open_book_fab">Abrir fichero PDF, FB2 o TXT</string>
+    <string name="download_fab">Descargar desde la nube</string>
+    <string name="create_book_fab">Crear nuevo libro</string>
+
+    <string name="settings_skin">Tema</string>
+    <string name="settings_hide_bar">Ocultar barra de estado durante la lectura</string>
+    <string name="settings_back_color">Color de fondo</string>
+    <string name="settings_enable_boundary_lines">Activar líneas guía</string>
+    <string name="settings_boundary">Líneas guía</string>
+    <string name="settings_boundary_color">Color de las líneas guía</string>
+    <string name="settings_boundary_thickness">Grosor de las líneas guía</string>
+    <string name="settings_text">Texto</string>
+    <string name="settings_text_size">Tamaño de texto</string>
+    <string name="settings_another_center_color">Color para la letra central de la palabra</string>
+    <string name="settings_center_color">Color para la letra central</string>
+    <string name="settings_word_color">Color de palabra</string>
+    <string name="settings_enable_boundary_summary">Para centrarse mejor en la palabra</string>
+    <string name="settings_boundary_color_summary">Color de las líneas guía (si no las necesitas, desactívalas)</string>
+    <string name="settings_hide_bar_summary">Espacio de lectura limpio.\nPero necesitarás clicar dos veces para parar (la primera para mostrar la barra de estado y la segunda para pausar)</string>
+    <string name="settings_back_color_summary">Color de fondo</string>
+    <string name="settings_center_color_summary">Activar para elegir el color de la letra central</string>
+    <string name="center_color_concr_summary">Color de la letra central de la palabra</string>
+    <string name="settings_word_color_summary">Color de la parte izquierda y derecha de la palabra</string>
+
+    <string name="choose_cerrect_file">Por favor, elige el fichero correcto</string>
+    <string name="chooe_file_manager">Por favor, elige el gestor de ficheros</string>
+    <string name="open_file">Abrir fichero</string>
+    <string name="default_file_manager">Gestor de fichero por defecto (recomendado)</string>
+    <string name="system_file_manager">Gestor de ficheros de sistema</string>
+    <string name="select_pdf_fb2_txt_files">Selecciona el fichero PDF, TXT o FB2 a subir</string>
+    <string name="you_spent_words">Gastaste todas tus palabras</string>
+    <string name="this_function_available_in_pro_version">Esta función está disponible en la versión PRO</string>
+    <string name="else_by_b_s_apps">Otras apps de \'B S Apps\'</string>
+    <string name="buy_pro_version">Comprar versión PRO</string>
+    <string name="help">Ayuda</string>
+    <string name="read_up_to_2k_pro">Puedes leer hasta 2000 palabras por minuto en la versión PRO</string>
+
+</resources>
