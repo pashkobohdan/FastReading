@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 import com.pashkobohdan.fastreading.R;
+import com.pashkobohdan.fastreading.data.dto.DBBookDTO;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
 
     private Activity activity;
 
-    private List<BookInfo> bookInfoList;
+    private List<DBBookDTO> bookInfoList;
 
     private BookEventListener edit;
     private BookEventListener share;
@@ -32,7 +33,7 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
     private BookEventListener clickOnBook;
     private BookEventListener longClickOnBook;
 
-    public BooksRecyclerViewAdapter(Activity activity, List<BookInfo> bookInfoList,
+    public BooksRecyclerViewAdapter(Activity activity, List<DBBookDTO> bookInfoList,
                                     BookEventListener edit,
                                     BookEventListener share,
                                     BookEventListener upload,
@@ -59,7 +60,7 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
 
     @Override
     public void onBindViewHolder(final BookViewHolder viewHolder, final int position) {
-        final BookInfo item = bookInfoList.get(position);
+        final DBBookDTO item = bookInfoList.get(position);
 
         viewHolder.getSwipeLayout().setShowMode(SwipeLayout.ShowMode.PullOut);
         viewHolder.getSwipeLayout().setOnClickListener(new View.OnClickListener() {
@@ -112,7 +113,7 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
             mItemManger.closeAllItems();
         }));
 
-        viewHolder.getBooksPicName().setText(item.getName().substring(0, 2).toUpperCase());
+        viewHolder.getBooksPicName().setText(item.getName().length() > 1 ? item.getName().substring(0, 2).toUpperCase() : item.getName().toUpperCase());
         viewHolder.getBooksPicName().setBackgroundColor(item.getColor());
         viewHolder.getBookName().setText(item.getName());
         viewHolder.getBookAuthor().setText(item.getAuthor());
@@ -120,10 +121,10 @@ public class BooksRecyclerViewAdapter extends RecyclerSwipeAdapter<BookViewHolde
         if (item.isWasRead()) {
             viewHolder.getBookCurrentAndTotalWords().setText((int) (100.0 * item.getCurrentWordNumber() / item.getWords().length) + PERCENT_SYMBOL);
         } else {
-            item.readWords(() -> activity.runOnUiThread(() ->
-                            viewHolder.getBookCurrentAndTotalWords().setText((int) (100.0 * item.getCurrentWordNumber() / item.getWords().length) + PERCENT_SYMBOL)),
-                    () -> activity.runOnUiThread(() ->
-                            viewHolder.getBookCurrentAndTotalWords().setText(R.string.book_list_book_reading_error)));
+            //            item.readWords(() -> activity.runOnUiThread(() ->
+            viewHolder.getBookCurrentAndTotalWords().setText((int) (100.0 * item.getCurrentWordNumber() / item.getWords().length) + PERCENT_SYMBOL);
+//                    () -> activity.runOnUiThread(() ->
+//                            viewHolder.getBookCurrentAndTotalWords().setText(R.string.book_list_book_reading_error)));
         }
 
 

@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.pashkobohdan.fastreading.R;
-import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
-import com.pashkobohdan.fastreading.library.fileSystem.file.FileReadingAndWriting;
+import com.pashkobohdan.fastreading.data.database.InsertBookAsyncTask;
+import com.pashkobohdan.fastreading.data.dto.DBBookDTO;
 
 
 /**
@@ -28,10 +28,10 @@ public class BookEditDialog {
 
     private AlertDialog alertDialog;
 
-    private BookInfo bookInfo;
+    private DBBookDTO bookInfo;
 
 
-    public BookEditDialog(final Activity activity, BookInfo bookInfo, Runnable successEdit) {
+    public BookEditDialog(final Activity activity, DBBookDTO bookInfo, Runnable successEdit) {
         this.bookInfo = bookInfo;
 
         LayoutInflater factory = LayoutInflater.from(activity);
@@ -45,7 +45,7 @@ public class BookEditDialog {
         bookAuthor.getEditText().setText(bookInfo.getAuthor());
 
 
-        bookText.setText(bookInfo.getAllText());
+        bookText.setText(bookInfo.getText());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 //.setTitle("Book's editing")
@@ -78,7 +78,7 @@ public class BookEditDialog {
                 .show();
     }
 
-    private boolean tryEditBook(Activity activity, BookInfo bookInfo) {
+    private boolean tryEditBook(Activity activity, DBBookDTO bookInfo) {
         if (bookName.isErrorEnabled() || bookAuthor.isErrorEnabled()) {
             new AlertDialog.Builder(activity)
                     .setPositiveButton(R.string.ok, (dialog, which) -> {
@@ -104,21 +104,25 @@ public class BookEditDialog {
                 bookInfo.setAuthor(author);
             }
 
-            if (!text.equals(bookInfo.getAllText()) && text.length() > 0) {
-                bookInfo.setAllText(text);
-                String[] words = text.
-                        trim().
-                        replaceAll("\\s+", " ").
-                        replaceAll("(\\.)+", "\\.").
-                        split(" ");
 
-                bookInfo.setWords(words);
+            if (!text.equals(bookInfo.getText()) && text.length() > 0) {
+                bookInfo.setText(text);
+//                String[] words = text.
+//                        trim().
+//                        replaceAll("\\s+", " ").
+//                        replaceAll("(\\.)+", "\\.").
+//                        split(" ");
+//
+//                bookInfo.setWords(words);
 
                 // add progressDialog !!!
 
-                new FileReadingAndWriting().write(bookInfo.getFile(), text, (o, n) -> {
-                });
+
             }
+            new InsertBookAsyncTask(() -> {
+            }, bookInfo).execute();
+//                new FileReadingAndWriting().write(bookInfo.getFile(), text, (o, n) -> {
+//                });
 
         } catch (Exception e) {
             e.printStackTrace();

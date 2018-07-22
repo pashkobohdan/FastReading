@@ -199,10 +199,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
-                    android:background="@android:color/transparent"
-                    android:src="@mipmap/tts"
+                    android:background="@drawable/book_read_tts_button"
                     android:textColor="@color/white" />
             </RelativeLayout>
+
+            <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_weight="1">-->
+
+                <!--<android.support.v7.widget.AppCompatImageButton-->
+                    <!--android:id="@+id/current_book_tts_on"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:background="@android:color/transparent"-->
+                    <!--android:src="@mipmap/tts"-->
+                    <!--android:textColor="@color/white" />-->
+            <!--</RelativeLayout>-->
             <!--<TextView-->
                 <!--android:id="@+id/current_book_current_speed"-->
                 <!--android:layout_width="wrap_content"-->

@@ -127,4 +127,8 @@
     <string name="chooe_file_manager">Выберите файловый менеджер</string>
     <string name="buy_pro_version">Купить Про версию</string>
     <string name="read_up_to_2k_pro">Вы можете читать до 2000 слов в минуту в Про версии</string>
+
+    <string name="tts_reading_confirm">Вы можете слушать ваши книги с технологией TTS (текст в речь). Попробовать бесплатно сейчас ?</string>
+    <string name="migrating_dialog_text">Пожалуйста, подождите пока книги переводятся в новое хранилище. Не закрывайте приложение</string>
+
 </resources>

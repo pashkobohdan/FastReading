@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -22,6 +23,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
@@ -40,6 +42,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.honu.aloha.WelcomeHelper;
 import com.morsebyte.shailesh.twostagerating.TwoStageRate;
+import com.pashkobohdan.fastreading.data.database.BookDAOHolder;
+import com.pashkobohdan.fastreading.data.database.InsertBookAsyncTask;
+import com.pashkobohdan.fastreading.data.dto.DBBookDTO;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfoFactory;
 import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
@@ -54,7 +59,9 @@ import com.pashkobohdan.fastreading.library.ui.dialogs.BookEditDialog;
 import com.pashkobohdan.fastreading.library.ui.lists.booksList.BooksRecyclerViewAdapter;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import ir.sohreco.androidfilechooser.ExternalStorageNotAvailableException;
 import ir.sohreco.androidfilechooser.FileChooserDialog;
@@ -81,6 +88,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             floatingActionButtonCreateBook;
 
     private MenuItem signInSignOut;
+    private View contentVontainer, migratingProgress;
 
     /**
      * Sorting
@@ -133,6 +141,8 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         /**
          * UI elements setup
          */
+        contentVontainer = findViewById(R.id.content_container);
+        migratingProgress = findViewById(R.id.migrating_progress);
         booksFloatingActionsMenu = (FloatingActionsMenu) findViewById(R.id.book_list_fab_menu);
         floatingActionButtonOpenFile = (FloatingActionButton) findViewById(R.id.book_list_open_pdf_fb2_txt_file);
         floatingActionButtonDownloadBook = (FloatingActionButton) findViewById(R.id.book_list_download_book_from_cloud);
@@ -145,23 +155,13 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("first_start", true)) {
-            BookInfo firstBook = BookInfoFactory.createNewInstance(new BookReadingResult(getResources().getString(R.string.first_book_text), getResources().getString(R.string.first_book_name), getResources().getString(R.string.first_book_author)), this);
-            if (firstBook == null) {
-                EmailCrashReport.sendCrashReport(this, new Exception("Cannot create first book. Device : " + System.getProperties().toString()));
-            }
+            createFirstBook();
 
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("first_start", false).apply();
         }
 
         // if data is already loaded
-        if (BookInfosList.getAll().size() == 0) {
-            initBookInfoData();
-        }
-
-        if (booksAdapter == null) {
-            initBooksListAdapter();
-        }
-
+        refreshBookListAndShow();
 
         /**
          * Init rate this app
@@ -205,6 +205,129 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
         database = FirebaseDatabase.getInstance();
         booksReference = database.getReference("books");
+
+
+        tryMakeMigrateFromOldBookSavingSystem();
+    }
+
+    private void refreshBookListAndShow() {
+        if (BookInfosList.getAll().size() == 0) {
+            refreshBookFromDB();
+        } else {
+            showBookList();
+        }
+    }
+
+
+    private void createFirstBook() {
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                DBBookDTO firstBook = BookInfoFactory.createNewInstance(new BookReadingResult(getResources().getString(R.string.first_book_text), getResources().getString(R.string.first_book_name), getResources().getString(R.string.first_book_author)), AllBooks.this);
+                BookDAOHolder.getDatabase().getBookDAO().insertAllBookDTO(firstBook);
+                if (firstBook == null) {
+                    EmailCrashReport.sendCrashReport(AllBooks.this, new Exception("Cannot create first book. Device : " + System.getProperties().toString()));
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                showBookList();
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    private void refreshBookFromDB() {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                initBookInfoData();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                showBookList();
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    private void showBookList() {
+        initBooksListAdapter();
+    }
+
+    private void tryMakeMigrateFromOldBookSavingSystem() {
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                return BookDAOHolder.getDatabase().getBookDAO().getAllBooks().size() == 0;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aVoid) {
+                if (aVoid) {
+                    startMigrate();
+                }
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    private void startMigrate() {
+        List<BookInfo> bookInfos = new ArrayList<>();
+        for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
+            bookInfos.add(BookInfoFactory.newInstance(file, this));
+        }
+        if (bookInfos.size() == 0) {
+            return;//Нечего мигрировать / установка после нее
+        }
+
+        runOnUiThread(this::showMigratingProgress);
+
+        copyNextBook(0, bookInfos);
+    }
+
+    private void copyNextBook(int currentIndex, List<BookInfo> bookInfos) {
+        if (currentIndex >= bookInfos.size() - 1) {
+            runOnUiThread(() -> {
+                hideMigratingProgress();
+                refreshBookFromDB();
+            });
+            return;
+        }
+        final BookInfo bookInfo = bookInfos.get(currentIndex);
+        bookInfo.readWords(() -> {
+            DBBookDTO migratingBookDTO = new DBBookDTO(bookInfo.getAllText(),
+                    bookInfo.getName(),
+                    bookInfo.getAuthor(),
+                    bookInfo.getColor(),
+                    bookInfo.getCurrentWordNumber(),
+                    bookInfo.getCurrentSpeed(),
+                    bookInfo.getLastOpeningDate(),
+                    bookInfo.isWasRead());
+            BookDAOHolder.getDatabase().getBookDAO().insertAllBookDTO(migratingBookDTO);
+            copyNextBook(currentIndex + 1, bookInfos);
+        }, () -> {
+            copyNextBook(currentIndex + 1, bookInfos);
+        });
+    }
+
+    private void showMigratingProgress() {
+        contentVontainer.setVisibility(View.GONE);
+        migratingProgress.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMigratingProgress() {
+        contentVontainer.setVisibility(View.VISIBLE);
+        migratingProgress.setVisibility(View.GONE);
     }
 
     private void authorizeInitialize() {
@@ -234,6 +357,9 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     protected void onResume() {
         super.onResume();
 
+
+        BookInfosList.getAll().clear();
+        refreshBookFromDB();
         refreshBookList();
 
         if (mShareEmail) {
@@ -523,7 +649,10 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 break;
         }
 
-        booksAdapter.notifyDataSetChanged();
+
+        if (booksAdapter != null) {
+            booksAdapter.notifyDataSetChanged();
+        }
     }
 
     private void initFABsListeners() {
@@ -537,16 +666,18 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
         });
         floatingActionButtonCreateBook.setOnClickListener(v -> {
             new BookAddDialog(this, bookInfo -> {
-                BookInfosList.add(bookInfo);
-                refreshBookList();
+//                BookInfosList.add(bookInfo);
+                new InsertBookAsyncTask(() -> {
+                    refreshBookList();
+                }, bookInfo).execute();
             }).show();
             booksFloatingActionsMenu.collapse();
         });
     }
 
     private void initBookInfoData() {
-        for (File file : getCacheDir().listFiles((directory, fileName) -> fileName.endsWith(INTERNAL_FILE_EXTENSION))) {
-            BookInfosList.add(BookInfoFactory.newInstance(file, this));
+        for (DBBookDTO bookDTO : BookDAOHolder.getDatabase().getBookDAO().getAllBooks()) {
+            BookInfosList.add(bookDTO);
         }
     }
 
@@ -555,9 +686,9 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
 
         booksAdapter = new BooksRecyclerViewAdapter(this, BookInfosList.getAll(), (bookInfo) -> {
 
-            if (!checkBookReady(bookInfo)) {
-                return;
-            }
+//            if (!checkBookReady(bookInfo)) {
+//                return;
+//            }
 
             new BookEditDialog(this, bookInfo, this::refreshBookList).show();
 
@@ -570,7 +701,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
                 return;
             }
 
-            FirebaseBook book = new FirebaseBook(bookInfo.getName(), bookInfo.getAuthor(), bookInfo.getAllText());
+            FirebaseBook book = new FirebaseBook(bookInfo.getName(), bookInfo.getAuthor(), bookInfo.getText());
 
             ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle(getString(R.string.dialog_book_upload_title));
@@ -587,9 +718,19 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        if (bookInfo.getFile().delete()) {
-                            ifConfirmed.run();
-                        }
+                        new AsyncTask<Void, Void, Void>() {
+
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                BookDAOHolder.getDatabase().getBookDAO().deleteBook(bookInfo);
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                ifConfirmed.run();
+                            }
+                        }.execute();
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -608,7 +749,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
             }
 
             Intent i = new Intent(this, CurrentBook.class);
-            i.putExtra(BOOK_INFO_EXTRA_NAME, bookInfo.getFile());
+            i.putExtra(BOOK_INFO_EXTRA_NAME, bookInfo.getId());
             startActivity(i);
 
         }, (bookInfo) -> {
@@ -624,7 +765,7 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     }
 
 
-    private boolean checkBookReady(BookInfo bookInfo) {
+    private boolean checkBookReady(DBBookDTO bookInfo) {
         if (bookInfo.isWasRead()) {
             if (bookInfo.getWords().length < 1) {
                 new AlertDialog.Builder(this)
@@ -760,16 +901,16 @@ public class AllBooks extends AppCompatActivity implements FileChooserDialog.Cho
     }
 
     private void addNewBookToBooksList(BookReadingResult bookOpeningResult) {
-        BookInfo newBookInfo = BookInfoFactory.createNewInstance(bookOpeningResult, this);
+        DBBookDTO newBookInfo = BookInfoFactory.createNewInstance(bookOpeningResult, this);
         if (newBookInfo == null) {
             Toast.makeText(this, R.string.book_writing_error, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        BookInfosList.add(newBookInfo);
-        refreshBookList();
-
-        booksAdapter.notifyItemInserted(BookInfosList.getAll().size() - 1);
+        new InsertBookAsyncTask(() -> {
+            refreshBookList();
+            booksAdapter.notifyItemInserted(BookInfosList.getAll().size() - 1);
+        }, newBookInfo).execute();
     }
 
 

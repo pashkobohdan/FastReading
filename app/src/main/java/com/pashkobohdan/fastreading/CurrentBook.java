@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -25,15 +27,16 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfo;
-import com.pashkobohdan.fastreading.library.bookTextWorker.BookInfosList;
+import com.pashkobohdan.fastreading.data.database.BookActionAsyncTask;
+import com.pashkobohdan.fastreading.data.database.BookDAOHolder;
+import com.pashkobohdan.fastreading.data.dto.DBBookDTO;
 import com.pashkobohdan.fastreading.library.bookTextWorker.Word;
 import com.pashkobohdan.fastreading.library.ui.button.ButtonContinuesClickAction;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -61,7 +64,7 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
     /**
      * Main object (activity works with it)
      */
-    private BookInfo bookInfo;
+    private DBBookDTO bookInfo;
 
     /**
      * UI elements (layouts and views)
@@ -85,9 +88,9 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
     private TextView ttsTextTextView;
 
     private TextToSpeech mTTS;
-    private boolean isTtsTurnedOn;
+//    private boolean isTtsTurnedOn;
 
-    private AppCompatImageButton ttsTurnOnButton;
+    private ImageButton ttsTurnOnButton;
 
     /**
      * Reading help objects
@@ -132,38 +135,25 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mDecorView = getWindow().getDecorView();
 
+
         // check bookInfo for cracks
-        if (!getBookInfo()) {
-            new AlertDialog.Builder(this)
-                    .setCancelable(false)
-                    .setTitle(R.string.error)
-                    .setMessage(R.string.book_loading_error)
-                    .setPositiveButton(R.string.ok, (dialog, which) -> finish())
-                    .show();
+//        if (!
+        getBookInfo();
+//                ) {
+//            new AlertDialog.Builder(this)
+//                    .setCancelable(false)
+//                    .setTitle(R.string.error)
+//                    .setMessage(R.string.book_loading_error)
+//                    .setPositiveButton(R.string.ok, (dialog, which) -> finish())
+//                    .show();
+//
+//            return;
+//        }
 
-            return;
-        }
-
-        // actionBar changing
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(bookInfo.getName());
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
 
 
         mTTS = new TextToSpeech(this, this);
         mTTS.setOnUtteranceCompletedListener(utteranceId -> runOnUiThread(() -> nextTtsSentence()));
-
-
-        /**
-         *  Here's all right ! (if we're here)
-         */
-
-        bookInfo.setLastOpeningDate((int) (new Date().getTime() / 1000));
-
-        parseWords();
-
-        initializeStartReadingValues();
 
         initializeListeners();
 
@@ -229,27 +219,54 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
         newSpeedOnPlaying.setVisibility(View.GONE);
 
         ttsTurnOnButton.setOnClickListener(v -> {
-            isTtsTurnedOn = !isTtsTurnedOn;
-
-            oneLineTextContainer.setVisibility(isTtsTurnedOn ? View.GONE : VISIBLE);
-            ttsTextContainer.setVisibility(isTtsTurnedOn ? VISIBLE : View.GONE);
-
-            if (!isTtsTurnedOn) {
-                if (mTTS != null && mTTS.isSpeaking()) {
-                    mTTS.stop();
-                }
-                ttsTurnOnButton.setImageResource(R.mipmap.tts);
-            } else {
-                nextTtsSentence();
-                ttsTurnOnButton.setImageResource(R.mipmap.tts_selected);
-            }
-
-            ttsTurnOnButton.setSelected(isTtsTurnedOn);
+//            isTtsTurnedOn = !isTtsTurnedOn;
+//
+//            oneLineTextContainer.setVisibility(isTtsTurnedOn ? View.GONE : VISIBLE);
+//            ttsTextContainer.setVisibility(isTtsTurnedOn ? VISIBLE : View.GONE);
+//
+//            if (!isTtsTurnedOn) {
+//                if (mTTS != null && mTTS.isSpeaking()) {
+//                    mTTS.stop();
+//                }
+//                ttsTurnOnButton.setImageResource(R.mipmap.tts);
+//            } else {
+//                nextTtsSentence();
+//                ttsTurnOnButton.setImageResource(R.mipmap.tts_selected);
+//            }
+//
+//            ttsTurnOnButton.setSelected(isTtsTurnedOn);
+            showTtsAppDialog();
         });
+    }
+    private void showTtsAppDialog() {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(CurrentBook.this);
+        builder1.setMessage(R.string.tts_reading_confirm);
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                getString(R.string.yes),
+                (dialog, id) -> openTtsReadingApp());
+
+        builder1.setNegativeButton(
+                getString(R.string.no),
+                (dialog, id) -> dialog.cancel());
+
+        AlertDialog alert = builder1.create();
+        alert.show();
+
+    }
+
+    private void openTtsReadingApp() {
+        final String appPackageName = "com.pashkobohdan.ttsreader.free";
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
     }
 
     private void nextTtsSentence() {
-        if(isTtsTurnedOn) {
+        if(false) {
             if (getReadingPosition() < words.size() - 1) {
 
                 StringBuilder nextSentence = new StringBuilder();
@@ -352,6 +369,9 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
     protected void onPause() {
         super.onPause();
 
+        new BookActionAsyncTask(()-> {}, ()-> {
+            BookDAOHolder.getDatabase().getBookDAO().updateBookPosition(readingPosition, bookInfo.getId());
+        }, bookInfo).execute();
         bookInfo.setCurrentWordNumber(readingPosition);
         refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
@@ -360,7 +380,9 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
     protected void onStop() {
         super.onStop();
 
-        bookInfo.setCurrentWordNumber(readingPosition);
+        new BookActionAsyncTask(()-> {}, ()-> {
+            BookDAOHolder.getDatabase().getBookDAO().updateBookPosition(readingPosition, bookInfo.getId());
+        }, bookInfo).execute();
         refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
 
@@ -374,7 +396,12 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
 
         super.onDestroy();
 
-        bookInfo.setCurrentWordNumber(readingPosition);
+        if(bookInfo!=null) {
+            new BookActionAsyncTask(()-> {}, ()-> {
+                BookDAOHolder.getDatabase().getBookDAO().updateBookPosition(readingPosition, bookInfo.getId());
+            }, bookInfo).execute();
+            bookInfo.setCurrentWordNumber(readingPosition);
+        }
         refreshStatus(ReadingStatus.STATUS_PAUSE);
     }
 
@@ -413,6 +440,10 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
     }
 
     private void speedMinus() {
+        new BookActionAsyncTask(()-> {}, ()-> {
+            BookDAOHolder.getDatabase().getBookDAO().updateBookSpeed(bookInfo.getCurrentSpeed() > SPEED_MIN_VALUE ?
+                    bookInfo.getCurrentSpeed() - SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed(), bookInfo.getId());
+        }, bookInfo).execute();
         bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() > SPEED_MIN_VALUE ?
                 bookInfo.getCurrentSpeed() - SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
         //currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
@@ -438,6 +469,10 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
     }
 
     private void speedPlus() {
+        new BookActionAsyncTask(()-> {}, ()-> {
+            BookDAOHolder.getDatabase().getBookDAO().updateBookSpeed(bookInfo.getCurrentSpeed() < SPEED_MAX_VALUE ?
+                    bookInfo.getCurrentSpeed() + SPEED_CHANGE_STEP: bookInfo.getCurrentSpeed(), bookInfo.getId());
+        }, bookInfo).execute();
         bookInfo.setCurrentSpeed(bookInfo.getCurrentSpeed() < SPEED_MAX_VALUE ?
                 bookInfo.getCurrentSpeed() + SPEED_CHANGE_STEP : bookInfo.getCurrentSpeed());
         //currentSpeed.setText(bookInfo.getCurrentSpeed() + "");
@@ -488,12 +523,46 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
      * Business logic
      */
 
-    private boolean getBookInfo() {
+    private void getBookInfo() {
         Intent i = getIntent();
-        File bookFile = (File) i.getSerializableExtra(BOOK_INFO_EXTRA_NAME);
+        long bookId = i.getLongExtra(BOOK_INFO_EXTRA_NAME, -1);
 
-        bookInfo = BookInfosList.get(bookFile);
-        return bookInfo != null;
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                List<DBBookDTO> bookById = BookDAOHolder.getDatabase().getBookDAO().bookByIdList(bookId);
+                bookInfo = bookById == null || bookById.size() == 0 ? null : bookById.get(0);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+
+                if (bookInfo == null) {
+                    new AlertDialog.Builder(CurrentBook.this)
+                            .setCancelable(false)
+                            .setTitle(R.string.error)
+                            .setMessage(R.string.book_loading_error)
+                            .setPositiveButton(R.string.ok, (dialog, which) -> finish())
+                            .show();
+                } else {
+                    new BookActionAsyncTask(()-> {}, ()-> {
+                        BookDAOHolder.getDatabase().getBookDAO().updateBookLasOpenDate((int) (new Date().getTime() / 1000), bookInfo.getId());
+                    }, bookInfo).execute();
+                    bookInfo.setLastOpeningDate((int) (new Date().getTime() / 1000));
+
+                    parseWords();
+
+                    initializeStartReadingValues();
+                    // actionBar changing
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(bookInfo.getName());
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    }
+                }
+            }
+        }.execute();
     }
 
 
@@ -503,6 +572,17 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
     }
 
     private void parseWords() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean anotherCenterColor = preferences.getBoolean("another_center_color", true);
+        int wordColor = preferences.getInt("word_color", getResources().getColor(R.color.word_color_default));
+        int centerLetterColor = preferences.getInt("center_letter_color", getResources().getColor(R.color.center_letter_color_default));
+
+        if (anotherCenterColor) {
+            currentWordCenterPart.setTextColor(centerLetterColor);
+        } else {
+            currentWordCenterPart.setTextColor(wordColor);
+        }
+
         words = new ArrayList<>();
 
         for (String word : bookInfo.getWords()) {
@@ -531,7 +611,7 @@ public class CurrentBook extends AppCompatActivity implements TextToSpeech.OnIni
 
 
         readingPanel.setOnClickListener(v -> {
-            if(isTtsTurnedOn) {
+            if(false) {
                 return;
             }
             if (currentReadingStatus == ReadingStatus.STATUS_PAUSE) {

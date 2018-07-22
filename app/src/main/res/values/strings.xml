@@ -161,5 +161,7 @@
     <string name="buy_pro_version">Buy pro version</string>
     <string name="help">Help</string>
     <string name="read_up_to_2k_pro">You can read up to 2000 words per mnute in Pro version</string>
+    <string name="tts_reading_confirm">You can just listen your book with TTS technology (Text to speech). Do you want try it now for free ?</string>
+    <string name="migrating_dialog_text">Please, wait while your books will be translated to new database version. Please, do not close application</string>
 
 </resources>

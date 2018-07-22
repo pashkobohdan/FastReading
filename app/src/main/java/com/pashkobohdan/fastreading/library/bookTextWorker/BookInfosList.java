@@ -1,6 +1,7 @@
 package com.pashkobohdan.fastreading.library.bookTextWorker;
 
-import java.io.File;
+import com.pashkobohdan.fastreading.data.dto.DBBookDTO;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,9 +10,9 @@ import java.util.List;
  */
 
 public class BookInfosList {
-    private static final List<BookInfo> bookInfos = new LinkedList<>();
+    private static final List<DBBookDTO> bookInfos = new LinkedList<>();
 
-    public static boolean add(BookInfo bookInfo){
+    public static boolean add(DBBookDTO bookInfo){
         if (bookInfos.contains(bookInfo)){
             return false;
         }else{
@@ -20,17 +21,17 @@ public class BookInfosList {
         }
     }
 
-    public static BookInfo get(File file){
-        for(BookInfo bookInfo : bookInfos){
-            if(bookInfo.getFile().getAbsolutePath().equals(file.getAbsolutePath())){
-                return bookInfo;
-            }
-        }
+//    public static BookInfo get(File file){
+//        for(BookInfo bookInfo : bookInfos){
+//            if(bookInfo.getFile().getAbsolutePath().equals(file.getAbsolutePath())){
+//                return bookInfo;
+//            }
+//        }
+//
+//        return null;
+//    }
 
-        return null;
-    }
-
-    public static List<BookInfo> getAll(){
+    public static List<DBBookDTO> getAll(){
         return bookInfos;
     }
 }
